@@ -11,7 +11,9 @@
       "schematics": {
         "@schematics/angular:component": {
           "inlineStyle": true,
-          "skipTests": true
+          "skipTests": true,
+          "exportDefault": true,
+          "prefix": ""
         },
         "@schematics/angular:class": {
           "skipTests": true
@@ -32,7 +34,8 @@
           "skipTests": true
         },
         "@schematics/angular:service": {
-          "skipTests": true
+          "skipTests": true,
+          "path": "src/app/core/services"
         }
       },
       "root": "",
@@ -51,7 +54,7 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles/styles.css"
             ]
           },
           "configurations": {

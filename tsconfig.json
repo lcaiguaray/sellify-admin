@@ -13,7 +13,28 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve"
+    "module": "preserve",
+    "baseUrl": "src",
+    "paths": {
+      // Core: El Cerebro (TS Puro)
+      "@core/*": ["core/*"],
+      "@domain/*": ["core/domain/*"],
+      "@application/*": ["core/application/*"],
+      "@core-shared/*": ["core/shared/*"],
+
+      // Infrastructure: Los Músculos
+      "@infra/*": ["infrastructure/*"],
+      "@repositories/*": ["infrastructure/repositories/*"],
+      "@mappers/*": ["infrastructure/mappers/*"],
+      "@dtos/*": ["infrastructure/dtos/*"],
+
+      // App: La Cara (Framework)
+      "@app/*": ["app/*"],
+      "@app-core/*": ["app/core/*"],
+      "@app-shared/*": ["app/shared/*"],
+      "@layouts/*": ["app/layouts/*"],
+      "@features/*": ["app/features/*"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

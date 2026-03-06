@@ -1,0 +1,59 @@
+<div class="min-h-svh">
+  <!-- Mobile -->
+  <div class="flex min-h-svh flex-col lg:hidden"></div>
+
+  <!-- Desktop -->
+  <div class="hidden relative min-h-svh lg:flex">
+    <div class="absolute inset-0 h-full w-full object-cover">
+      <img ngSrc="/images/backgrounds/sellify-bg.jpg" alt="Bg" fill />
+    </div>
+    <div class="absolute inset-0 bg-back/30"></div>
+
+    <div class="relative flex w-1/2 flex-col items-center justify-center overflow-hidden p-16 z-10">
+      <div class="relative flex flex-col items-center gap-8 text-center scheme-dark">
+        <div
+          class="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm"
+        >
+          <img ngSrc="/branding/logo-iso.svg" alt="Logo" width="38" height="38" />
+        </div>
+
+        <h2 class="max-w-sm text-foreground text-5xl leading-tight text-balance font-bold">
+          Tu tienda online, sin limites.
+        </h2>
+        <p class="max-w-xs text-foreground text-base leading-relaxed">
+          Todo lo que necesitas para vender, crecer y escalar tu negocio digital.
+        </p>
+      </div>
+    </div>
+
+    <div class="z-10 flex w-1/2 flex-col justify-center">
+      <div class="flex flex-col bg-background max-w-lg gap-6 px-10 py-8 rounded-xl">
+        <header>
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500/30">
+              <img ngSrc="/branding/logo-iso.svg" alt="Logo" width="20" height="20" />
+            </div>
+            <span class="text-xl font-bold tracking-tight text-foreground">Sellify</span>
+          </div>
+        </header>
+
+        <div class="w-full flex-1">
+          <div class="flex flex-col leading-2 mb-8">
+            <span class="text-3xl tracking-tight text-foreground font-bold">Bienvenido</span>
+            <span class="leading-relaxed text-secondary">Ingresa a tu cuenta para continuar</span>
+          </div>
+
+          <login-form />
+        </div>
+
+        <footer class="flex items-center justify-between text-xs text-secondary/50">
+          <span>2026 Sellify, Inc.</span>
+          <div class="flex gap-4">
+            <span class="transition-colors hover:text-secondary">Privacidad</span>
+            <span class="transition-colors hover:text-secondary">Terminos</span>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
