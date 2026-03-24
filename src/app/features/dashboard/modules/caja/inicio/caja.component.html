@@ -1,0 +1,225 @@
+<div class="flex min-w-0 flex-auto flex-col">
+  <div class="bg-card flex flex-0 items-center px-4 py-2 md:px-6 md:py-4">
+    <div class="flex-1">
+      <h2 class="text-2xl font-extrabold leading-normal tracking-tight md:text-3xl">
+        Caja
+      </h2>
+      <div class="flex items-center text-sm text-gray-500 gap-2 mt-1">
+        <a routerLink="/inicio" class="flex items-center hover:text-primary transition-colors">
+          <span class="iconify solar--home-smile-angle-bold text-lg"></span>
+        </a>
+        <span>/</span>
+        <span class="font-medium">Inicio</span>
+      </div>
+    </div>
+
+    @if (permisosAuth().includes('COMPROBANTE_EMITIR')) {
+      <div>
+        <a mat-flat-button color="primary" [routerLink]="'/admin/caja/crear'">
+          <div class="flex items-center gap-1">
+            <span class="iconify tabler--plus"></span>
+            <span>Nuevo</span>
+          </div>
+        </a>
+      </div>
+    }
+  </div>
+
+  <div class="px-4 pt-2 md:px-6 md:pt-4">
+    
+    <div class="bg-card mb-4 rounded-xl border border-gray-200 shadow-sm px-4 py-3">
+      <form [formGroup]="formulario" (ngSubmit)="filtrar()">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
+          <div>
+            <mat-form-field class="w-full">
+              <mat-label>Busqueda</mat-label>
+              <input matInput formControlName="busqueda" placeholder="Buscar por serie, nro..." />
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full">
+              <mat-label>Fechas</mat-label>
+              <mat-date-range-input [rangePicker]="picker" formGroupName="fechas">
+                <input matStartDate formControlName="inicio" placeholder="Fecha inicio" />
+                <input matEndDate formControlName="fin" placeholder="Fecha fin" />
+              </mat-date-range-input>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field class="w-full">
+              <mat-label>Estado</mat-label>
+              <mat-select formControlName="estado">
+                @for (item of estados; track $index) {
+                  <mat-option [value]="item">{{ item ? item : 'TODOS' }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              mat-flat-button
+              color="primary"
+              [disabled]="tablaLoading()"
+            >
+              @if (tablaLoading()) {
+                <mat-progress-spinner [diameter]="24" mode="indeterminate"></mat-progress-spinner>
+              } @else {
+                <span>Filtrar</span>
+              }
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="bg-card rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+        <span class="font-semibold">Listado</span>
+        <!-- <button mat-flat-button color="primary" (click)="exportar()">
+          <div class="flex items-center gap-1">
+            <span class="iconify file-icons--microsoft-excel"></span>
+            <span>Exportar</span>
+          </div>
+        </button> -->
+      </div>
+
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="tablaData()">
+          <ng-container matColumnDef="documento">
+            <th mat-header-cell *matHeaderCellDef class="w-36 max-w-36 text-nowrap text-center">
+              Serie
+            </th>
+            <td mat-cell *matCellDef="let element" class="w-36 max-w-36 text-nowrap text-center">
+              {{ element.nroSerie + '-' + element.nroComprobante }}
+            </td>
+            <td mat-footer-cell *matFooterCellDef colspan="2" class="text-center font-medium">
+              Total
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="cliente">
+            <th mat-header-cell *matHeaderCellDef class="text-nowrap">
+              Cliente
+            </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="leading-tight">
+                <div>
+                  {{
+                    element.cliente?.persona?.nombres + ' ' +
+                    element.cliente?.persona?.apellidoPaterno + ' ' +
+                    element.cliente?.persona?.apellidoMaterno || '-'
+                  }}
+                </div>
+                <div class="text-secondary text-sm">
+                  {{ element.cliente?.persona?.id || '-' }}
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="monto">
+            <th mat-header-cell *matHeaderCellDef class="text-nowrap text-center">
+              Monto
+            </th>
+            <td mat-cell *matCellDef="let element" class="text-nowrap text-end">
+              S/ {{ element.monto | number: '1.2-2' }}
+            </td>
+            <td mat-footer-cell *matFooterCellDef class="text-end font-medium">
+              S/ {{ tablaMontoTotal() | number: '1.2-2' }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef class="text-nowrap text-center">
+              Fecha
+            </th>
+            <td mat-cell *matCellDef="let element" class="text-nowrap text-center">
+              {{ element.fechaHoraInicio | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
+
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef class="text-nowrap text-center w-26 max-w-26">
+              Tipo
+            </th>
+            <td mat-cell *matCellDef="let element" class="text-nowrap text-center w-26 max-w-26">
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" 
+                    [ngClass]="getBadgeClass(element.tipo)">
+                {{ element.tipo }}
+              </span>
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef class="text-nowrap text-center w-36 max-w-36">
+              Estado
+            </th>
+            <td mat-cell *matCellDef="let element" class="text-nowrap text-center w-36 max-w-36">
+              <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" 
+                    [ngClass]="getBadgeClass(element.estado)">
+                {{ element.estado }}
+              </span>
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef class="w-24 text-center"></th>
+            <td mat-cell *matCellDef="let element" class="text-center">
+              <div class="flex items-center justify-center gap-1">
+                
+                <!-- @if (element.estado === 'POR VALIDAR') {
+                  <button type="button" matTooltip="Observar" class="flex items-center justify-center gap-1 rounded-lg bg-rose-100 w-7 h-7 text-md font-medium text-rose-800 transition-colors duration-300 hover:bg-opacity-70" (click)="observarDialogo(element)">
+                    <span class="iconify icon-size-4.5 fluent--document-signature-20-regular"></span>
+                  </button>
+                }
+
+                @if (element.estado === 'PAGADO') {
+                  <button type="button" matTooltip="Anular" class="flex items-center justify-center gap-1 rounded-lg bg-rose-100 w-7 h-7 text-md font-medium text-rose-800 transition-colors duration-300 hover:bg-opacity-70" (click)="anularDialogo(element)">
+                    <span class="iconify icon-size-4.5 fluent--document-dismiss-20-regular"></span>
+                  </button>
+                } -->
+
+                <a matTooltip="Ver" class="flex items-center justify-center gap-1 rounded-lg bg-sky-100 w-7 h-7 text-md font-medium text-sky-800 transition-colors duration-300 hover:bg-opacity-70" [routerLink]="['./', element.idMovimiento]">
+                  <span class="iconify icon-size-4.5 solar--eye-linear"></span>
+                </a>
+
+                <!-- <button type="button" matTooltip="PDF" class="flex items-center justify-center gap-1 rounded-lg bg-slate-100 w-7 h-7 text-md font-medium text-slate-800 transition-colors duration-300 hover:bg-opacity-70" (click)="verComprobante(element)">
+                  <span class="iconify icon-size-4.5 fluent--document-pdf-20-regular"></span>
+                </button> -->
+              </div>
+            </td>
+            <td mat-footer-cell *matFooterCellDef></td>
+          </ng-container>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell px-4 text-center" [attr.colspan]="tablaColumnas.length">
+              No se encontraron resultados.
+            </td>
+          </tr>
+          <tr mat-header-row *matHeaderRowDef="tablaColumnas; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: tablaColumnas"></tr>
+          <tr mat-footer-row *matFooterRowDef="footerTablaColumnas"></tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        class="flex items-center justify-end"
+        (page)="handlePageEvent($event)"
+        [length]="tablaPaginacion().length"
+        [pageSize]="tablaPaginacion().pageSize"
+        [disabled]="tablaLoading()"
+        [pageSizeOptions]="[10, 50, 100]"
+        aria-label="Select page"
+      />
+    </div>
+  </div>
+</div>

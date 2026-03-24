@@ -1,0 +1,270 @@
+<div class="flex min-w-0 flex-auto flex-col">
+  <div class="bg-card flex flex-0 items-center px-4 py-2 md:px-6 md:py-4">
+    <div class="flex-1">
+      <h2 class="text-2xl font-extrabold leading-normal tracking-tight md:text-3xl">
+        Caja
+      </h2>
+      <div class="flex items-center text-sm text-gray-500 gap-2 mt-1">
+        <a routerLink="/admin" class="flex items-center hover:text-primary transition-colors">
+          <span class="iconify solar--home-smile-angle-bold text-lg"></span>
+        </a>
+        <span>/</span>
+        <a routerLink="/admin/caja" class="hover:text-primary transition-colors font-medium">Caja</a>
+        <span>/</span>
+        <span class="font-medium">Crear</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-auto px-4 pt-2 md:px-6 md:pt-4">
+    <div class="mb-4 flex flex-wrap items-center gap-2">
+      <div class="flex items-center gap-1">
+        <span class="rounded-md bg-slate-200 px-2 py-1 font-medium leading-none text-slate-900">F1</span>
+        <span class="text-md font-medium">Buscar Cliente</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">F2</span>
+        <span class="text-md font-medium">Buscar Articulos</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">F3</span>
+        <span class="text-md font-medium">Ingresar Pago</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">F4</span>
+        <span class="text-md font-medium">Actualizar</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">Enter</span>
+        <span class="text-md font-medium">Guardar</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      
+      <div>
+        <div class="bg-card rounded-xl border border-gray-200 shadow-sm relative mb-4 overflow-hidden">
+          <div class="flex items-center justify-between gap-2 px-3 py-3 border-b border-gray-100">
+            <div class="flex items-center gap-1 text-lg font-medium">
+              <span class="iconify icon-size-5 tabler--user-filled"></span>
+              <span>Cliente</span>
+            </div>
+            <span class="flex items-center justify-center rounded-md bg-slate-200 px-2 py-1 text-sm text-slate-900">F1</span>
+          </div>
+
+          <div class="z-10 px-4 pb-4 pt-3 relative">
+            <div class="grid grid-cols-1 gap-3">
+              <div class="md:col-span-2 text-sm">
+                <div class="font-bold text-base mb-1">
+                  {{ displayNombreAlumno(alumnoSeleccionado()) }}
+                </div>
+               
+                <div class="text-slate-600">
+                  <span class="font-medium text-slate-900">DNI/RUC:</span>
+                  {{ alumnoSeleccionado()?.idAlumno ?? '-' }}
+                </div>
+              </div>
+
+              <div class="text-center mt-2 flex flex-col items-center gap-2">
+                <button type="button" (click)="buscarAlumnoDialogo()"
+                  class="inline-flex w-full items-center justify-center gap-1 rounded-lg bg-slate-200 px-3 py-2 font-medium transition-colors duration-300 hover:bg-slate-300">
+                  <span class="iconify icon-size-5 tabler--eye-filled"></span>
+                  <span>Seleccionar Cliente</span>
+                </button>
+
+                <mat-checkbox [checked]="mantenerDatos()" (change)="mantenerDatos.set($event.checked)"
+                  [disabled]="!alumnoSeleccionado()" color="primary" class="text-sm font-medium"
+                  [class.opacity-50]="!alumnoSeleccionado()">
+                  Mantener datos
+                </mat-checkbox>
+              </div>
+            </div>
+          </div>
+          <span class="iconify absolute -bottom-4 -right-6 rotate-15 text-slate-500/10 text-9xl tabler--user-filled pointer-events-none"></span>
+        </div>
+
+        <div class="bg-card rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+          <div class="flex items-center justify-between gap-2 px-3 py-3 border-b border-gray-100">
+            <div class="flex items-center gap-1 text-lg font-medium">
+              <span class="iconify icon-size-5 clarity--dollar-bill-solid"></span>
+              <span>Pago</span>
+            </div>
+            <span class="flex items-center justify-center rounded-md bg-slate-200 px-2 py-1 text-sm text-slate-900">F3</span>
+          </div>
+
+          <div class="z-10 px-4 pb-4 pt-3 relative">
+            <div class="mb-4 flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2 font-medium">
+                <span class="text-slate-600">Total</span>
+                <div class="flex w-36 items-center gap-1 rounded bg-gray-100 px-3 py-2 text-right font-bold shadow-inner">
+                  <span>S/</span>
+                  <input type="text" readonly [value]="total() | number: '1.2-2'" class="w-full bg-transparent text-right outline-none text-slate-900" />
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-2 font-medium">
+                <span class="text-slate-600">Pago</span>
+                <div class="flex w-36 items-center gap-1 rounded bg-white border border-gray-300 px-3 py-2 text-right font-bold shadow-sm focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500 transition-all">
+                  <span>S/</span>
+                  <input #inputPago type="number" min="0" step="0.01" autocomplete="off"
+                    name="pago" [ngModel]="pago()" (ngModelChange)="pago.set($any($event))"
+                    class="w-full bg-transparent text-right outline-none" placeholder="0.00" />
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-2 font-medium">
+                <span class="text-slate-600">Vuelto</span>
+                <div class="flex w-36 items-center gap-1 rounded bg-gray-100 px-3 py-2 text-right font-bold shadow-inner" [ngClass]="{'text-red-500': vuelto() < 0, 'text-emerald-600': vuelto() >= 0}">
+                  <span>S/</span>
+                  <input type="text" readonly [value]="(vuelto() > 0 ? vuelto() : 0) | number: '1.2-2'" class="w-full bg-transparent text-right outline-none" />
+                </div>
+              </div>
+            </div>
+
+            <button type="button" mat-flat-button color="primary" class="w-full !rounded-full !py-6" [disabled]="loading()" (click)="guardar()">
+              @if (loading()) {
+                <mat-progress-spinner [diameter]="24" mode="indeterminate"></mat-progress-spinner>
+              } @else {
+                <div class="flex items-center gap-2 text-base">
+                  <span class="iconify text-2xl tabler--credit-card-pay"></span>
+                  <span>Procesar Pago</span>
+                </div>
+              }
+            </button>
+          </div>
+          <span class="iconify absolute -bottom-4 -right-6 rotate-15 text-slate-500/10 text-9xl clarity--dollar-bill-solid pointer-events-none"></span>
+        </div>
+
+        @if (resumenPagos().length > 0) {
+          <div class="rounded-xl mt-4 border-2 border-primary-100 bg-primary-50/30 overflow-hidden">
+            <div class="flex items-center justify-between gap-2 px-3 py-2 border-b border-primary-100 bg-white/50">
+              <div class="flex items-center gap-1 text-lg font-medium text-primary-800">
+                <span class="iconify icon-size-5 tabler--receipt"></span>
+                <span>Resumen de Pagos</span>
+              </div>
+            </div>
+            
+            <div class="px-4 py-3">
+              <div class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
+                @for (item of resumenPagos(); track item.idMovimiento) {
+                  <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-slate-200">
+                    <span class="font-bold text-sm text-slate-800">
+                      {{ item.nroSerie }}-{{ item.nroComprobante }}
+                    </span>
+                    <span class="font-extrabold text-base text-slate-900">
+                      S/ {{ item.monto | number: '1.2-2' }}
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <div class="mt-4 pt-3 border-t-2 border-primary-200 flex justify-between items-center">
+                <span class="font-bold text-lg text-slate-800">Total Día:</span>
+                <span class="font-extrabold text-xl text-primary-600">
+                  S/ {{ totalResumen() | number: '1.2-2' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="lg:col-span-2">
+        <div class="bg-card rounded-xl border border-gray-200 shadow-sm overflow-hidden h-full flex flex-col">
+          <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 text-lg font-medium">
+              <span class="iconify icon-size-5 heroicons--rectangle-group-16-solid"></span>
+              <span>Productos a Pagar</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="flex items-center justify-center rounded-md bg-slate-200 px-2 py-1 text-sm text-slate-900 hidden sm:flex">F2</span>
+              <button type="button" (click)="buscarConceptoDialogo()"
+                class="inline-flex items-center justify-center gap-1 rounded-lg bg-primary-600 text-white px-3 py-1.5 font-medium transition-colors duration-300 hover:bg-primary-700 shadow-sm">
+                <span class="iconify icon-size-5 tabler--circle-plus-filled"></span>
+                <span>Buscar Producto</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-auto flex-1">
+            <table mat-table [dataSource]="conceptos()">
+              <ng-container matColumnDef="nombre">
+                <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                <td mat-cell *matCellDef="let element" class="py-2">
+                  <div class="leading-tight">
+                    <div class="font-medium text-slate-900">{{ element.nombre }}</div>
+                    <div class="text-slate-500 text-xs mt-0.5">{{ element.codigo }}</div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cantidad">
+                <th mat-header-cell *matHeaderCellDef class="w-40 min-w-40 max-w-40 text-center">
+                  Cantidad
+                </th>
+                <td mat-cell *matCellDef="let element" class="w-40 min-w-40 max-w-40">
+                  <div class="flex w-full items-center justify-center gap-1">
+                    <button type="button"
+                      class="rounded-md bg-gray-100 p-2 hover:bg-gray-200 focus:outline-none transition-colors"
+                      (click)="actualizarCantidad(element, element.cantidad - 1)">
+                      <span class="iconify tabler--minus"></span>
+                    </button>
+
+                    <input type="number" min="1"
+                      class="block h-9 w-16 rounded-md border border-gray-200 bg-white text-center text-sm font-medium focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
+                      [value]="element.cantidad"
+                      (blur)="actualizarCantidad(element, $event.target.value)" />
+
+                    <button type="button"
+                      class="rounded-md bg-gray-100 p-2 hover:bg-gray-200 focus:outline-none transition-colors"
+                      (click)="actualizarCantidad(element, element.cantidad + 1)">
+                      <span class="iconify tabler--plus"></span>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="monto">
+                <th mat-header-cell *matHeaderCellDef class="text-right pr-6">
+                  Precio Unit.
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-right pr-6 font-medium text-slate-700">
+                  S/ {{ element.monto | number: '1.2-2' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="total">
+                <th mat-header-cell *matHeaderCellDef class="text-right pr-6">
+                  Subtotal
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-right pr-6 font-bold text-slate-900">
+                  S/ {{ (element.cantidad * element.monto) | number: '1.2-2' }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef class="w-16 min-w-16 text-center"></th>
+                <td mat-cell *matCellDef="let element" class="w-16 min-w-16 text-center">
+                  <button type="button" mat-icon-button color="warn" (click)="eliminarConcepto(element)" matTooltip="Quitar concepto">
+                    <span class="iconify icon-size-5 hugeicons--delete-02"></span>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell px-6 py-12 text-center text-slate-500" [attr.colspan]="conceptoColumnas.length">
+                  <div class="flex flex-col items-center justify-center gap-2">
+                    <span class="iconify text-4xl text-slate-300 tabler--receipt-off"></span>
+                    <span>No hay productos agregados. Haga clic en "Buscar Producto" o presione F2.</span>
+                  </div>
+                </td>
+              </tr>
+              <tr mat-header-row *matHeaderRowDef="conceptoColumnas; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: conceptoColumnas" class="hover:bg-slate-50/50 transition-colors"></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
