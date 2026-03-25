@@ -1,0 +1,112 @@
+<div mat-dialog-title class="bg-primary-600 font-medium text-primary-50">
+  Buscar Cliente
+</div>
+<mat-dialog-content class="p-0">
+  <div class="p-3">
+    <div class="flex flex-col items-center gap-2 md:flex-row md:justify-between">
+      <mat-form-field class="w-full md:max-w-md">
+        <mat-label>Buscar por nombre o documento</mat-label>
+        <input matInput placeholder="Buscar..." [formControl]="busquedaControl" />
+
+        <div matSuffix class="flex items-center gap-1">
+          @if (tablaLoading()) {
+            <mat-progress-spinner diameter="24" mode="indeterminate"></mat-progress-spinner>
+          }
+
+          <button
+            type="button"
+            mat-icon-button
+            color="primary"
+            matTooltip="Nuevo Cliente"
+            (click)="crearCliente()"
+          >
+            <span class="iconify icon-size-5 tabler--user-plus"></span>
+          </button>
+        </div>
+      </mat-form-field>
+
+      <div class="flex items-center justify-center gap-2">
+        <div class="flex items-center gap-1">
+          <span class="rounded-md bg-slate-200 px-2 py-1 font-medium leading-none text-slate-900">↑↓</span>
+          <span class="text-md font-medium">Navegar</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">Enter</span>
+          <span class="text-md font-medium">Seleccionar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table mat-table [dataSource]="tablaData()">
+      
+      <ng-container matColumnDef="item">
+        <th mat-header-cell *matHeaderCellDef class="w-20 max-w-20 text-center"></th>
+        <td mat-cell *matCellDef="let element; let i = index" class="w-20 max-w-20 text-center">
+          <span class="rounded-md px-2 py-1 font-medium"
+            [ngClass]="{
+              'bg-emerald-300 text-emerald-900': cliente()?.idCliente === element.idCliente,
+              'bg-slate-200 text-slate-900': cliente()?.idCliente !== element.idCliente
+            }">
+            {{ i + 1 }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="cliente">
+        <th mat-header-cell *matHeaderCellDef>Cliente</th>
+        <td mat-cell *matCellDef="let element" class="leading-tight py-2">
+          <div class="font-medium text-slate-900">{{ displayNombreCliente(element) }}</div>
+          <div class="text-slate-500 text-sm mt-0.5">ID: {{ element.idCliente }}</div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="documento">
+        <th mat-header-cell *matHeaderCellDef class="text-nowrap text-center">
+          Documento
+        </th>
+        <td mat-cell *matCellDef="let element" class="text-nowrap text-center font-medium">
+          {{ element.documento }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="tipo">
+        <th mat-header-cell *matHeaderCellDef class="text-nowrap text-center">
+          Tipo
+        </th>
+        <td mat-cell *matCellDef="let element" class="text-nowrap text-center">
+          <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold"
+            [ngClass]="{
+              'bg-blue-100 text-blue-800 border-blue-200': element.tipo === 'NATURAL',
+              'bg-purple-100 text-purple-800 border-purple-200': element.tipo === 'JURIDICA'
+            }">
+            {{ element.tipo }}
+          </span>
+        </td>
+      </ng-container>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell px-4 py-8 text-center text-slate-500" [attr.colspan]="tablaColumnas.length">
+          No se encontraron clientes con ese término.
+        </td>
+      </tr>
+      
+      <tr mat-header-row *matHeaderRowDef="tablaColumnas; sticky: true"></tr>
+      <tr mat-row *matRowDef="let element; let i = index; columns: tablaColumnas"
+        (click)="seleccionarCliente(element)"
+        class="cursor-pointer transition-colors"
+        [ngClass]="{ 'bg-primary-50/80': tablaIndex() === i, 'hover:bg-slate-50': tablaIndex() !== i }">
+      </tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    class="flex items-center justify-end"
+    (page)="handlePageEvent($event)"
+    [length]="tablaPaginacion().length"
+    [pageSize]="tablaPaginacion().pageSize"
+    [disabled]="tablaLoading()"
+    aria-label="Select page"
+  />
+</mat-dialog-content>

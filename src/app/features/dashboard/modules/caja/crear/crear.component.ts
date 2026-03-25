@@ -19,6 +19,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
+import { BuscarClienteDialogoComponent } from '../buscar-cliente-dialog/buscar-cliente-dialog';
+import { BuscarProductoDialogoComponent } from '../buscar-producto-dialog/buscar-producto-dialog';
 
 @Component({
   selector: 'app-crear',
@@ -50,7 +52,7 @@ export default class CrearComponent {
   conceptos = signal<any[]>([]);
   conceptoColumnas: string[] = ['nombre', 'cantidad', 'monto', 'total', 'acciones'];
 
-  alumnoSeleccionado = signal<any | null>(null);
+  clienteSeleccionado = signal<any | null>(null);
 
   total = computed(() =>
     this.conceptos().reduce((sum, c) => sum + ((c.monto ?? 0) * c.cantidad), 0)
@@ -68,7 +70,7 @@ export default class CrearComponent {
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(e: KeyboardEvent) {
     if (e.key === 'F1') { e.preventDefault(); this.buscarAlumnoDialogo(); return; }
-    if (e.key === 'F2') { e.preventDefault(); this.buscarConceptoDialogo(); return; }
+    if (e.key === 'F2') { e.preventDefault(); this.buscarProductoDialogo(); return; }
     if (e.key === 'F3') { e.preventDefault(); this.inputPago?.nativeElement?.focus(); return; }
     if (e.key === 'F4') {
       e.preventDefault();
@@ -83,40 +85,50 @@ export default class CrearComponent {
     }
   }
 
-  displayNombreAlumno(alumno: any): string {
-    if (!alumno) return '-';
-    return `${alumno.nombres} ${alumno.apellidoPaterno} ${alumno.apellidoMaterno}`;
+  displayNombreCliente(cliente: any): string {
+    if (!cliente) return '-';
+    return `${cliente.nombres} ${cliente.apellidoPaterno} ${cliente.apellidoMaterno}`.trim();
   }
-
   // --- MOCK: Simula la selección de un alumno ---
   buscarAlumnoDialogo() {
-    console.log('Simulando apertura de diálogo de alumno...');
-    const alumnoMock = {
-      idAlumno: '20234512',
-      nombres: 'Carlos Alberto',
-      apellidoPaterno: 'Ruiz',
-      apellidoMaterno: 'Zavaleta',
-      unidadAcademica: 'Ingeniería de Software'
-    };
-    
-    if (this.alumnoSeleccionado()?.idAlumno !== alumnoMock.idAlumno) {
-      this.resumenPagos.set([]);
-    }
-    this.alumnoSeleccionado.set(alumnoMock);
+    this._dialog.closeAll();
+    const dialogRef = this._dialog.open(BuscarClienteDialogoComponent, {
+      panelClass: 'mat-dialog-lg',
+      data: { cliente: this.clienteSeleccionado() },
+    });
+
+    // Nos suscribimos para escuchar cuando se seleccione un cliente desde la tabla del modal
+    dialogRef.afterOpened().subscribe(() => {
+      dialogRef.componentInstance.clienteSeleccionado.subscribe((cliente: any) => {
+        if (this.clienteSeleccionado()?.idCliente !== cliente?.idCliente) {
+          this.resumenPagos.set([]); // Reseteamos los pagos si cambia de cliente
+        }
+        this.clienteSeleccionado.set(cliente);
+      });
+    });
   }
 
   // --- MOCK: Simula la selección de un concepto ---
-  buscarConceptoDialogo() {
-    console.log('Simulando apertura de diálogo de concepto...');
-    const conceptoMock = {
-      id: Math.random().toString(36).substring(7),
-      codigo: 'C-' + Math.floor(Math.random() * 1000),
-      nombre: 'Mensualidad Marzo 2026',
-      monto: 350.00,
-      cantidad: 1
-    };
+  buscarProductoDialogo() {
+    // IMPORTANTE: Asegúrate de importar el componente BuscarProductoDialogoComponent
+    const dialogRef = this._dialog.open(BuscarProductoDialogoComponent, {
+      panelClass: 'mat-dialog-lg',
+      // Le pasamos los productos que ya están en la tabla para que los marque de verde
+      data: { productos: this.conceptos() }, 
+    });
 
-    this.conceptos.update((lista) => [...lista, conceptoMock]);
+    dialogRef.afterOpened().subscribe(() => {
+      dialogRef.componentInstance.productoSeleccionado.subscribe((producto: any) => {
+        // La misma lógica de toogle: si existe lo quita, si no, lo agrega
+        this.conceptos.update((lista) => {
+          const existe = lista.some((c) => c.id === producto.id);
+          return existe
+            ? lista.filter((c) => c.id !== producto.id)
+            // Ojo: cambiamos 'monto' por 'precio' al agregarlo
+            : [...lista, { ...producto, monto: producto.precio, cantidad: 1 }]; 
+        });
+      });
+    });
   }
 
   eliminarConcepto(concepto: any) {
@@ -137,8 +149,8 @@ export default class CrearComponent {
 
   // --- MOCK: Simula el guardado en base de datos ---
   guardar() {
-    if (!this.alumnoSeleccionado()) {
-      alert('Error: Debe seleccionar un alumno (Presione F1 o Buscar)');
+    if (!this.clienteSeleccionado()) {
+      alert('Error: Debe seleccionar un cliente (Presione F1 o Buscar)');
       return;
     }
 
@@ -154,7 +166,6 @@ export default class CrearComponent {
 
     this.loading.set(true);
     
-    // Simulamos retraso de red
     setTimeout(() => {
       alert('¡Éxito! Se ha registrado correctamente.');
       
@@ -170,12 +181,11 @@ export default class CrearComponent {
       this.conceptos.set([]);
       
       if (!this.mantenerDatos()) {
-        this.alumnoSeleccionado.set(null);
+        this.clienteSeleccionado.set(null); // Limpiamos el cliente
         this.resumenPagos.set([]); 
       }
 
       this.loading.set(false);
-      alert(`Generando PDF para comprobante: ${mockComprobanteGenerado.nroSerie}-${mockComprobanteGenerado.nroComprobante}`);
       
     }, 800);
   }

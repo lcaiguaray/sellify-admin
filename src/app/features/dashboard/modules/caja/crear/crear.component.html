@@ -56,12 +56,12 @@
             <div class="grid grid-cols-1 gap-3">
               <div class="md:col-span-2 text-sm">
                 <div class="font-bold text-base mb-1">
-                  {{ displayNombreAlumno(alumnoSeleccionado()) }}
+                  {{ displayNombreCliente(clienteSeleccionado()) }}
                 </div>
                
                 <div class="text-slate-600">
                   <span class="font-medium text-slate-900">DNI/RUC:</span>
-                  {{ alumnoSeleccionado()?.idAlumno ?? '-' }}
+                  {{ clienteSeleccionado()?.documento ?? '-' }}
                 </div>
               </div>
 
@@ -73,8 +73,8 @@
                 </button>
 
                 <mat-checkbox [checked]="mantenerDatos()" (change)="mantenerDatos.set($event.checked)"
-                  [disabled]="!alumnoSeleccionado()" color="primary" class="text-sm font-medium"
-                  [class.opacity-50]="!alumnoSeleccionado()">
+                  [disabled]="!clienteSeleccionado()" color="primary" class="text-sm font-medium"
+                  [class.opacity-50]="!clienteSeleccionado()">
                   Mantener datos
                 </mat-checkbox>
               </div>
@@ -178,7 +178,7 @@
             </div>
             <div class="flex items-center gap-3">
               <span class="flex items-center justify-center rounded-md bg-slate-200 px-2 py-1 text-sm text-slate-900 hidden sm:flex">F2</span>
-              <button type="button" (click)="buscarConceptoDialogo()"
+              <button type="button" (click)="buscarProductoDialogo()"
                 class="inline-flex items-center justify-center gap-1 rounded-lg bg-primary-600 text-white px-3 py-1.5 font-medium transition-colors duration-300 hover:bg-primary-700 shadow-sm">
                 <span class="iconify icon-size-5 tabler--circle-plus-filled"></span>
                 <span>Buscar Producto</span>
