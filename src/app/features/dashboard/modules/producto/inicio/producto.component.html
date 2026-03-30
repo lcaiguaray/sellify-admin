@@ -1,0 +1,83 @@
+<div class="flex min-w-0 flex-auto flex-col">
+  <div class="bg-card flex flex-0 items-center px-4 py-2 md:px-6 md:py-4">
+    <div class="flex-1">
+      <h2 class="text-2xl font-extrabold tracking-tight md:text-3xl">Maestro de Productos</h2>
+      <div class="flex items-center text-sm text-gray-500 gap-2 mt-1">
+        <a routerLink="/admin" class="hover:text-primary"><span class="iconify solar--home-smile-angle-bold text-lg"></span></a>
+        <span>/</span><span class="font-medium">Productos</span>
+      </div>
+    </div>
+    <button mat-flat-button color="primary" (click)="abrirDialogo()">
+      <div class="flex items-center gap-1"><span class="iconify iconamoon--sign-plus-bold"></span><span>Nuevo Producto</span></div>
+    </button>
+  </div>
+
+  <div class="px-4 pt-2 md:px-6 md:pt-4">
+    <div class="bg-card rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="flex items-center px-4 py-3 bg-gray-50/50 border-b border-gray-100">
+        <mat-form-field appearance="outline" class="w-full max-w-sm mt-2">
+          <mat-label>Buscar producto...</mat-label>
+          <input matInput [formControl]="busquedaControl" />
+          <span matSuffix class="iconify text-slate-400 mr-2 tabler--search icon-size-5"></span>
+        </mat-form-field>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="tablaData()" class="w-full">
+          <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef class="w-32">Código</th>
+            <td mat-cell *matCellDef="let element" class="font-medium text-slate-600">{{ element.codigo }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef>Producto</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="font-bold text-slate-900">{{ element.nombre }}</div>
+              <div class="text-xs text-slate-500">Unidad Base: {{ element.unidadBase }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="categoria">
+            <th mat-header-cell *matHeaderCellDef>Categoría</th>
+            <td mat-cell *matCellDef="let element"><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded-md text-xs font-semibold">{{ element.categoria }}</span></td>
+          </ng-container>
+
+          <ng-container matColumnDef="stock">
+            <th mat-header-cell *matHeaderCellDef>Inventario</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="font-bold text-emerald-700">{{ element.stockBase }} {{ element.unidadBase }}s</div>
+              @for (eq of element.equivalencias; track eq.unidad) {
+                <div class="text-xs text-slate-500 font-medium">+ {{ eq.stock }} {{ eq.unidad }}(s)</div>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="precio">
+            <th mat-header-cell *matHeaderCellDef class="text-right">Precio Base</th>
+            <td mat-cell *matCellDef="let element" class="text-right font-bold">S/ {{ element.precioBase | number:'1.2-2' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef class="w-32 text-center">Acciones</th>
+            <td mat-cell *matCellDef="let element" class="w-32 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button mat-icon-button color="accent" matTooltip="Convertir Stock" (click)="abrirConversor(element)">
+                  <span class="iconify icon-size-5 tabler--arrows-exchange"></span>
+                </button>
+                <button mat-icon-button color="primary" matTooltip="Editar" (click)="abrirDialogo(element)">
+                  <span class="iconify icon-size-5 tabler--edit"></span>
+                </button>
+                <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="eliminar(element)">
+                  <span class="iconify icon-size-5 tabler--trash"></span>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="tablaColumnas" class="bg-slate-50"></tr>
+          <tr mat-row *matRowDef="let row; columns: tablaColumnas" class="hover:bg-slate-50/50"></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

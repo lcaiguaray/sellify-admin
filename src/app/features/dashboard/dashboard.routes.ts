@@ -16,6 +16,10 @@ const routes: Routes = [
       {
         path: 'caja/crear',
         loadComponent: () => import('./modules/caja/crear/crear.component'),
+      },
+      {
+        path: 'producto',
+        loadComponent: () => import('./modules/producto/inicio/producto.component'),
       }
     ],
   },

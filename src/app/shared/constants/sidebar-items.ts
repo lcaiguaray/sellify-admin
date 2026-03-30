@@ -28,6 +28,12 @@ export const NAVIGATION: NavigationItem[] = [
         icon: 'iconify iconoir--graduation-cap',
         route: '/admin/caja'
       },
+      {
+        id: 'producto',
+        label: 'Producto',
+        icon: 'iconify iconoir--graduation-cap',
+        route: '/admin/producto'
+      },
       
     ],
   },

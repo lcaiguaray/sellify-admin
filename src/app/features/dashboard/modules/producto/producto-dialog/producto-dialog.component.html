@@ -1,0 +1,66 @@
+<div mat-dialog-title class="bg-primary-600 text-primary-50 px-6 py-4 font-bold">
+  {{ esEdicion ? 'Editar Producto' : 'Registrar Nuevo Producto' }}
+</div>
+
+<mat-dialog-content class="p-6">
+  <form [formGroup]="formulario" class="flex flex-col gap-2 mt-2">
+    <div class="text-primary-700 font-bold mb-2 border-b pb-1">Información Básica</div>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <mat-form-field appearance="outline"><mat-label>Código</mat-label><input matInput formControlName="codigo"></mat-form-field>
+      <mat-form-field appearance="outline" class="md:col-span-2"><mat-label>Nombre del Producto</mat-label><input matInput formControlName="nombre"></mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Categoría</mat-label>
+        <mat-select formControlName="categoria">
+          @for (cat of categorias; track cat) { <mat-option [value]="cat">{{ cat }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+      <mat-form-field appearance="outline">
+        <mat-label>Unidad Base (Menor)</mat-label>
+        <mat-select formControlName="unidadBase">
+          @for (u of unidadesMedida; track u) { <mat-option [value]="u">{{ u }}</mat-option> }
+        </mat-select>
+        <mat-hint>Ej. La unidad más pequeña que vendes</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Precio Base (S/)</mat-label><input matInput type="number" formControlName="precioBase"></mat-form-field>
+      <mat-form-field appearance="outline"><mat-label>Stock Inicial (Base)</mat-label><input matInput type="number" formControlName="stockBase"></mat-form-field>
+    </div>
+
+    <div class="flex items-center justify-between mt-6 mb-2 border-b pb-1">
+      <div class="text-primary-700 font-bold">Presentaciones Alternativas (Equivalencias)</div>
+      <button type="button" mat-flat-button color="accent" class="scale-90" (click)="agregarEquivalencia()">+ Agregar Presentación</button>
+    </div>
+
+    <div formArrayName="equivalencias" class="flex flex-col gap-3">
+      @if (equivalencias.controls.length === 0) {
+        <div class="text-sm text-slate-500 italic text-center py-4 bg-slate-50 rounded-lg">Este producto solo se vende por {{ formulario.get('unidadBase')?.value }}.</div>
+      }
+      @for (eq of equivalencias.controls; track $index; let i = $index) {
+        <div [formGroupName]="i" class="flex flex-wrap items-center gap-3 bg-white p-3 rounded-lg border border-primary-100 shadow-sm relative">
+          <div class="text-sm font-bold text-slate-700 w-full mb-1">1 <span class="text-primary-600">Presentación</span> equivale a:</div>
+          
+          <mat-form-field appearance="outline" class="w-32"><mat-label>Unidad Alt.</mat-label>
+            <mat-select formControlName="unidad">@for (u of unidadesMedida; track u) { <mat-option [value]="u">{{ u }}</mat-option> }</mat-select>
+          </mat-form-field>
+          
+          <span class="font-bold text-slate-400">=</span>
+          
+          <mat-form-field appearance="outline" class="w-24"><mat-label>Factor</mat-label><input matInput type="number" formControlName="factor"></mat-form-field>
+          <span class="text-sm font-medium text-slate-600 mr-4">{{ formulario.get('unidadBase')?.value }}s</span>
+
+          <mat-form-field appearance="outline" class="w-32"><mat-label>Precio (S/)</mat-label><input matInput type="number" formControlName="precio"></mat-form-field>
+          <mat-form-field appearance="outline" class="w-32"><mat-label>Stock Inicial</mat-label><input matInput type="number" formControlName="stock"></mat-form-field>
+          
+          <button type="button" mat-icon-button color="warn" class="absolute top-2 right-2" (click)="removerEquivalencia(i)"><span class="iconify tabler--x"></span></button>
+        </div>
+      }
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="flex justify-end gap-2 px-6 py-4 border-t">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" (click)="guardar()">Guardar Producto</button>
+</mat-dialog-actions>
