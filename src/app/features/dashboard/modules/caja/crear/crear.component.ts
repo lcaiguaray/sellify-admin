@@ -21,6 +21,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { BuscarClienteDialogoComponent } from '../buscar-cliente-dialog/buscar-cliente-dialog';
 import { BuscarProductoDialogoComponent } from '../buscar-producto-dialog/buscar-producto-dialog';
+import { AlertDialogComponent } from '@app/features/components/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-crear',
@@ -150,43 +151,48 @@ export default class CrearComponent {
   // --- MOCK: Simula el guardado en base de datos ---
   guardar() {
     if (!this.clienteSeleccionado()) {
-      alert('Error: Debe seleccionar un cliente (Presione F1 o Buscar)');
-      return;
-    }
-
-    if (!this.conceptos().length) {
-      alert('Error: Debe seleccionar al menos un concepto (Presione F2 o Agregar)');
-      return;
-    }
-
-    if ((this.pago() || 0) < this.total()) {
-      alert('Error: El monto de pago no puede ser menor al total');
-      return;
-    }
-
-    this.loading.set(true);
-    
-    setTimeout(() => {
-      alert('¡Éxito! Se ha registrado correctamente.');
-      
-      const mockComprobanteGenerado = {
-        idMovimiento: 'MOV-' + Math.floor(Math.random() * 10000),
-        nroSerie: 'B001',
-        nroComprobante: '00' + Math.floor(Math.random() * 10000),
-        monto: this.total()
-      };
-
-      this.resumenPagos.update((pagos) => [...pagos, mockComprobanteGenerado]);
-      this.pago.set(0);
-      this.conceptos.set([]);
-      
-      if (!this.mantenerDatos()) {
-        this.clienteSeleccionado.set(null); // Limpiamos el cliente
-        this.resumenPagos.set([]); 
+    this._dialog.open(AlertDialogComponent, {
+      width: '400px',
+      data: {
+        tipo: 'warning',
+        titulo: 'Faltan datos',
+        mensaje: 'Debe seleccionar un cliente antes de procesar el pago (Presione F1).'
       }
+    });
+    return;
+  }
 
-      this.loading.set(false);
-      
-    }, 800);
+  if (!this.conceptos().length) {
+    this._dialog.open(AlertDialogComponent, {
+      width: '400px',
+      data: {
+        tipo: 'warning',
+        titulo: 'Carrito vacío',
+        mensaje: 'Debe agregar al menos un producto al comprobante (Presione F2).'
+      }
+    });
+    return;
+  }
+
+  this.loading.set(true);
+  
+  setTimeout(() => {
+    // Éxito al guardar
+    this._dialog.open(AlertDialogComponent, {
+      width: '400px',
+      data: {
+        tipo: 'success',
+        titulo: '¡Venta Exitosa!',
+        mensaje: 'El comprobante ha sido registrado y el stock actualizado.',
+        textoConfirmar: 'Aceptar'
+      }
+    });
+
+    this.resumenPagos.update((pagos) => [...pagos, { /* data mock */ }]);
+    this.pago.set(0);
+    this.conceptos.set([]);
+    if (!this.mantenerDatos()) this.clienteSeleccionado.set(null);
+    this.loading.set(false);
+  }, 800);
   }
 }

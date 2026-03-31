@@ -11,6 +11,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { ProductoDialogComponent } from '../producto-dialog/producto-dialog.component';
 import { ConvertirStockDialogComponent } from '../convertir-stock-dialog/convertir-stock-dialog.component';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AlertDialogComponent } from '@app/features/components/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-producto',
@@ -18,11 +20,12 @@ import { ConvertirStockDialogComponent } from '../convertir-stock-dialog/convert
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule, ReactiveFormsModule, MatTableModule, MatPaginatorModule,
-    MatButtonModule, MatFormFieldModule, MatInputModule, MatTooltipModule, RouterLink
+    MatButtonModule, MatFormFieldModule, MatInputModule, MatTooltipModule, RouterLink, MatSnackBarModule
   ]
 })
 export default class ProductoComponent implements OnInit {
   readonly _dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
 
   busquedaControl = new FormControl('');
   tablaData = signal<any[]>([]);
@@ -78,8 +81,12 @@ export default class ProductoComponent implements OnInit {
         if (producto) {
           const index = this.mockProductos.findIndex(p => p.id === res.id);
           if (index !== -1) this.mockProductos[index] = res;
+          // REEMPLAZO DEL TOAST SUCCESS
+          this._snackBar.open('Producto actualizado correctamente', 'Cerrar', { duration: 3000 });
         } else {
           this.mockProductos.unshift(res);
+          // REEMPLAZO DEL TOAST SUCCESS
+          this._snackBar.open('Producto registrado correctamente', 'Cerrar', { duration: 3000 });
         }
         this.cargarDatos();
       }
@@ -104,10 +111,24 @@ export default class ProductoComponent implements OnInit {
   }
 
   eliminar(producto: any) {
-    if(confirm(`¿Eliminar ${producto.nombre}?`)) {
-      this.mockProductos = this.mockProductos.filter(p => p.id !== producto.id);
-      this.cargarDatos();
-    }
+    const dialogRef = this._dialog.open(AlertDialogComponent, {
+      width: '400px',
+      data: {
+        titulo: 'Eliminar Producto',
+        mensaje: `¿Estás seguro de eliminar el producto "${producto.nombre}"? Esta acción no se puede deshacer.`,
+        textoBoton: 'Eliminar',
+        color: 'warn'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmado => {
+      if (confirmado) {
+        this.mockProductos = this.mockProductos.filter(p => p.id !== producto.id);
+        this.cargarDatos();
+        // REEMPLAZO DEL TOAST INFO
+        this._snackBar.open('El producto ha sido eliminado', 'Cerrar', { duration: 3000 }); 
+      }
+    });
   }
 
   handlePageEvent(e: PageEvent) { this.tablaPaginacion.set(e); }

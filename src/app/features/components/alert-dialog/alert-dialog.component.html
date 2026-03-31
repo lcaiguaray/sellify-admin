@@ -1,0 +1,27 @@
+<div class="flex flex-col items-center pt-8 px-6 pb-2 text-center">
+  <div [ngClass]="iconoConfig.bg" class="flex h-16 w-16 items-center justify-center rounded-full mb-4 shadow-sm">
+    <span class="iconify text-4xl" [ngClass]="iconoConfig.icon + ' ' + iconoConfig.color"></span>
+  </div>
+  
+  <h2 mat-dialog-title class="m-0 text-xl font-bold text-slate-800 p-0 mb-2">
+    {{ data.titulo || 'Atención' }}
+  </h2>
+</div>
+
+<mat-dialog-content class="text-slate-600 px-6 py-2 text-center text-base">
+  {{ data.mensaje }}
+</mat-dialog-content>
+
+<mat-dialog-actions class="flex justify-center gap-3 px-6 py-6 pb-8">
+  
+  @if (mostrarCancelar) {
+    <button mat-button mat-dialog-close class="min-w-24 font-medium text-slate-500 bg-slate-100 hover:bg-slate-200">
+      {{ data.textoCancelar || 'Cancelar' }}
+    </button>
+  }
+  
+  <button mat-flat-button [color]="data.colorConfirmar || 'primary'" [mat-dialog-close]="true" class="min-w-24">
+    {{ data.textoConfirmar || 'Aceptar' }}
+  </button>
+  
+</mat-dialog-actions>

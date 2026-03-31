@@ -2,19 +2,23 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AlertDialogComponent } from '@app/features/components/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-convertir-stock-dialogo',
   templateUrl: './convertir-stock-dialog.component.html',
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule]
+  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatSnackBarModule]
 })
 export class ConvertirStockDialogComponent implements OnInit {
   readonly _dialogRef = inject(MatDialogRef<ConvertirStockDialogComponent>);
   readonly data = inject<{ producto: any }>(MAT_DIALOG_DATA);
+  private _snackBar = inject(MatSnackBar);
+  readonly _dialog = inject(MatDialog);
 
   producto: any;
   presentacionesDisponibles: any[] = [];
@@ -60,23 +64,32 @@ export class ConvertirStockDialogComponent implements OnInit {
     const unidadesInvolucradas = equivalencia.factor * cantidad;
 
     if (tipo === 'EMPACAR') {
-      if (this.producto.stockBase < unidadesInvolucradas) {
-        alert(`No tienes suficientes ${this.producto.unidadBase}s. Necesitas ${unidadesInvolucradas}.`);
-        return;
-      }
-      this.producto.stockBase -= unidadesInvolucradas;
-      this.producto.equivalencias[eqIndex].stock += cantidad;
-
-    } else { // DESEMPACAR
-      if (equivalencia.stock < cantidad) {
-        alert(`No tienes suficientes ${equivalencia.unidad}s para abrir. Tienes ${equivalencia.stock}.`);
-        return;
-      }
-      this.producto.equivalencias[eqIndex].stock -= cantidad;
-      this.producto.stockBase += unidadesInvolucradas;
+    if (this.producto.stockBase < unidadesInvolucradas) {
+      this._dialog.open(AlertDialogComponent, {
+        width: '400px',
+        data: {
+          tipo: 'error',
+          titulo: 'Stock Insuficiente',
+          mensaje: `No puedes empacar esta cantidad. Te faltan ${unidadesInvolucradas - this.producto.stockBase} unidades sueltas.`
+        }
+      });
+      return;
     }
+    // ...
+  }
 
-    alert('¡Conversión de inventario exitosa!');
+  // Al finalizar con éxito
+  const dialogRef = this._dialog.open(AlertDialogComponent, {
+    width: '400px',
+    data: {
+      tipo: 'success',
+      titulo: 'Conversión Lista',
+      mensaje: 'Las unidades han sido transformadas correctamente en el inventario.'
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(() => {
     this._dialogRef.close({ productoActualizado: this.producto });
+  });
   }
 }
