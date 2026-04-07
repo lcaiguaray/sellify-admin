@@ -34,6 +34,12 @@ export const NAVIGATION: NavigationItem[] = [
         icon: 'iconify iconoir--graduation-cap',
         route: '/admin/producto'
       },
+      {
+        id: 'transferencia',
+        label: 'Transferencia',
+        icon: 'iconify iconoir--graduation-cap',
+        route: '/admin/transferencia'
+      },
       
     ],
   },

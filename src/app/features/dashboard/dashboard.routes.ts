@@ -20,6 +20,10 @@ const routes: Routes = [
       {
         path: 'producto',
         loadComponent: () => import('./modules/producto/inicio/producto.component'),
+      },
+      {
+        path: 'transferencia',
+        loadComponent: () => import('./modules/transferencia/inicio/transferencia.component'),
       }
     ],
   },
