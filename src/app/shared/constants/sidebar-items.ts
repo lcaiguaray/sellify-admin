@@ -30,9 +30,15 @@ export const NAVIGATION: NavigationItem[] = [
       },
       {
         id: 'producto',
-        label: 'Producto',
+        label: 'Almacen',
         icon: 'iconify iconoir--graduation-cap',
         route: '/admin/producto'
+      },
+      {
+        id: 'persona',
+        label: 'Persona',
+        icon: 'iconify iconoir--graduation-cap',
+        route: '/admin/persona'
       },
       {
         id: 'transferencia',

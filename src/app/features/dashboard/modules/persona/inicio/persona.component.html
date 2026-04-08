@@ -1,0 +1,118 @@
+<div class="flex min-w-0 flex-auto flex-col">
+  <div class="bg-card flex flex-0 items-center px-4 py-2 md:px-6 md:py-4">
+    <div class="flex-1">
+      <h2 class="text-2xl font-extrabold leading-normal tracking-tight md:text-3xl">
+        Persona
+      </h2>
+      <div class="flex items-center text-sm text-gray-500 gap-2 mt-1">
+        <a routerLink="/admin" class="flex items-center hover:text-primary transition-colors">
+          <span class="iconify solar--home-smile-angle-bold text-lg"></span>
+        </a>
+        <span>/</span>
+        <span class="font-medium">Persona</span>
+      </div>
+    </div>
+
+    <div>
+      <button mat-flat-button color="primary" (click)="abrirDialogo()">
+        <div class="flex items-center gap-1">
+          <span class="iconify iconamoon--sign-plus-bold"></span>
+          <span>Nueva Persona</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="px-4 pt-2 md:px-6 md:pt-4">
+    <div class="bg-card rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      
+      <div class="flex items-center justify-between border-b border-gray-100 px-4 py-3 bg-gray-50/50">
+        <mat-form-field appearance="outline" class="w-full max-w-sm mt-2">
+          <mat-label>Buscar por nombre o documento</mat-label>
+          <input matInput [formControl]="busquedaControl" placeholder="Ej. Juan Pérez" />
+          <span matSuffix class="iconify text-slate-400 mr-2 tabler--search icon-size-5"></span>
+        </mat-form-field>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="tablaData()" class="w-full">
+          
+          <ng-container matColumnDef="item">
+            <th mat-header-cell *matHeaderCellDef class="w-16 text-center">N°</th>
+            <td mat-cell *matCellDef="let element; let i = index" class="w-16 text-center text-slate-500 font-medium">
+              {{ i + 1 }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="nombres">
+            <th mat-header-cell *matHeaderCellDef>Nombre Completo / Razón Social</th>
+            <td mat-cell *matCellDef="let element" class="py-3">
+              <div class="font-semibold text-slate-900">{{ getNombreCompleto(element) }}</div>
+              <div class="text-slate-500 text-xs mt-0.5">ID: {{ element.id }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="documento">
+            <th mat-header-cell *matHeaderCellDef class="text-nowrap text-center">Documento</th>
+            <td mat-cell *matCellDef="let element" class="text-nowrap text-center">
+              <div class="font-medium text-slate-800">{{ element.documento }}</div>
+              <div class="text-slate-500 text-xs">{{ element.tipoDocumento }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="roles">
+            <th mat-header-cell *matHeaderCellDef>Roles Asignados</th>
+            <td mat-cell *matCellDef="let element" class="py-2">
+              <div class="flex flex-wrap gap-1">
+                @for (rol of element.roles; track rol) {
+                  <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold shadow-sm"
+                    [ngClass]="{
+                      'bg-blue-100 text-blue-800 border border-blue-200': rol === 'CLIENTE',
+                      'bg-purple-100 text-purple-800 border border-purple-200': rol === 'PROVEEDOR',
+                      'bg-amber-100 text-amber-800 border border-amber-200': rol === 'VENDEDOR' || rol === 'CAJERO',
+                      'bg-rose-100 text-rose-800 border border-rose-200': rol === 'ADMINISTRADOR',
+                      'bg-slate-100 text-slate-800 border border-slate-200': rol === 'ALMACEN'
+                    }">
+                    {{ rol }}
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef class="w-24 text-center">Acciones</th>
+            <td mat-cell *matCellDef="let element" class="w-24 text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button type="button" mat-icon-button color="primary" matTooltip="Editar" (click)="abrirDialogo(element)">
+                  <span class="iconify icon-size-5 tabler--edit"></span>
+                </button>
+                <button type="button" mat-icon-button color="warn" matTooltip="Eliminar" (click)="eliminar(element)">
+                  <span class="iconify icon-size-5 tabler--trash"></span>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell px-6 py-10 text-center text-slate-500" [attr.colspan]="tablaColumnas.length">
+              No se encontraron personas registradas.
+            </td>
+          </tr>
+          
+          <tr mat-header-row *matHeaderRowDef="tablaColumnas; sticky: true" class="bg-slate-50"></tr>
+          <tr mat-row *matRowDef="let row; columns: tablaColumnas" class="hover:bg-slate-50/50 transition-colors"></tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        class="flex items-center justify-end border-t border-slate-200"
+        (page)="handlePageEvent($event)"
+        [length]="tablaPaginacion().length"
+        [pageSize]="tablaPaginacion().pageSize"
+        [pageSizeOptions]="[10, 20, 50]"
+        aria-label="Seleccionar página"
+      />
+    </div>
+  </div>
+</div>

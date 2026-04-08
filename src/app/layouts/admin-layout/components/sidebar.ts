@@ -18,7 +18,7 @@ import { NgOptimizedImage } from '@angular/common';
         </div>
 
         <div class="flex flex-col">
-          <div class="text-on-surface text-lg leading-4 font-bold tracking-wider">Sellify</div>
+          <div class="text-on-surface text-lg leading-4 font-bold tracking-wider">JASNIK</div>
           <div class="font-mono text-xs leading-3 font-medium tracking-wide">Admin</div>
         </div>
       </div>

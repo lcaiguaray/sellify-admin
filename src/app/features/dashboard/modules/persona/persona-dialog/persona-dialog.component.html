@@ -1,0 +1,58 @@
+<div mat-dialog-title class="bg-primary-600 font-medium text-primary-50 px-6 py-4">
+  {{ esEdicion ? 'Editar Persona' : 'Nueva Persona' }}
+</div>
+
+<mat-dialog-content class="p-6">
+  <form [formGroup]="formulario" class="flex flex-col gap-4 mt-2">
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Nombres</mat-label>
+        <input matInput formControlName="nombres" placeholder="Ej. Juan Carlos" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Apellido Paterno</mat-label>
+        <input matInput formControlName="apellidoPaterno" placeholder="Ej. Pérez" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Apellido Materno</mat-label>
+        <input matInput formControlName="apellidoMaterno" placeholder="Ej. Gómez" />
+      </mat-form-field>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Tipo Doc.</mat-label>
+        <mat-select formControlName="tipoDocumento">
+          @for (tipo of tiposDocumento; track tipo) {
+            <mat-option [value]="tipo">{{ tipo }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Nro. Documento</mat-label>
+        <input matInput formControlName="documento" placeholder="Ej. 12345678" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Roles Asignados</mat-label>
+        <mat-select formControlName="roles" multiple>
+          @for (rol of listaRoles; track rol) {
+            <mat-option [value]="rol">{{ rol }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-100">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-flat-button color="primary" (click)="guardar()">
+    {{ esEdicion ? 'Actualizar' : 'Guardar' }}
+  </button>
+</mat-dialog-actions>
