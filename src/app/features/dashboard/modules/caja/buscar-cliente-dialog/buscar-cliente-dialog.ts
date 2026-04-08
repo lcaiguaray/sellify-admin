@@ -46,7 +46,6 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
   ],
 })
 export class BuscarClienteDialogoComponent implements OnInit {
-  // Emitimos 'any' ya que no usamos interfaz externa
   @Output() clienteSeleccionado = new EventEmitter<any>();
 
   readonly _dialog = inject(MatDialog);
@@ -63,14 +62,12 @@ export class BuscarClienteDialogoComponent implements OnInit {
     length: 0,
   });
   
-  // Columnas adaptadas a "Cliente"
   tablaColumnas: string[] = ['item', 'cliente', 'documento', 'tipo'];
   tablaData = signal<any[]>([]);
   tablaIndex = signal<number>(0);
 
   busquedaControl = new FormControl('');
 
-  // --- MOCK DATA ---
   private readonly MOCK_CLIENTES = [
     { idCliente: 'CLI-001', nombres: 'Juan', apellidoPaterno: 'Pérez', apellidoMaterno: 'Gómez', documento: '12345678', tipo: 'NATURAL' },
     { idCliente: 'CLI-002', nombres: 'María', apellidoPaterno: 'López', apellidoMaterno: 'Díaz', documento: '87654321', tipo: 'NATURAL' },
@@ -82,7 +79,6 @@ export class BuscarClienteDialogoComponent implements OnInit {
   ngOnInit() {
     this.cliente.set(this.data?.cliente ?? null);
     
-    // Carga inicial
     this.handleFiltro('');
 
     this.busquedaControl.valueChanges
@@ -128,7 +124,6 @@ export class BuscarClienteDialogoComponent implements OnInit {
     return `${cliente.nombres} ${cliente.apellidoPaterno} ${cliente.apellidoMaterno}`.trim();
   }
 
-  // Filtrado 100% estático
   handleFiltro(term: string | null) {
     this.tablaLoading.set(true);
     
@@ -140,24 +135,22 @@ export class BuscarClienteDialogoComponent implements OnInit {
 
       this.tablaData.set(filtrados);
       this.tablaPaginacion.update(p => ({ ...p, length: filtrados.length }));
-      this.tablaIndex.set(0); // Reinicia el cursor de navegación
+      this.tablaIndex.set(0); 
       this.tablaLoading.set(false);
-    }, 400); // Retraso simulado
+    }, 400); 
   }
 
   handlePageEvent(e: PageEvent) {
     this.tablaPaginacion.set(e);
-    // En un caso real aquí llamarías al backend, aquí solo mockeamos el evento
   }
 
   seleccionarCliente(cliente: any) {
     this.cliente.update((i) => (i?.idCliente === cliente.idCliente ? null : cliente));
     this.clienteSeleccionado.emit(this.cliente());
-    this._dialogRef.close(this.cliente()); // Cerramos el modal al elegir
+    this._dialogRef.close(this.cliente()); 
   }
 
   crearCliente() {
-    // Al no tener el componente de CrearDialogoComponent, simulamos la acción
     alert('Función de crear cliente mockeada. Aquí se abriría el modal de creación.');
   }
 }

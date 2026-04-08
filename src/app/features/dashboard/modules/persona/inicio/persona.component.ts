@@ -44,7 +44,6 @@ export default class PersonaComponent implements OnInit {
     length: 0,
   });
 
-  // --- MOCK DATA INICIAL ---
   private mockPersonas: any[] = [
     { id: 'PER-001', nombres: 'Jimmy', apellidoPaterno: 'Dev', apellidoMaterno: '', tipoDocumento: 'DNI', documento: '12345678', roles: ['ADMINISTRADOR', 'VENDEDOR'] },
     { id: 'PER-002', nombres: 'María', apellidoPaterno: 'López', apellidoMaterno: 'Díaz', tipoDocumento: 'DNI', documento: '87654321', roles: ['CLIENTE'] },
@@ -90,7 +89,7 @@ export default class PersonaComponent implements OnInit {
           if (index !== -1) this.mockPersonas[index] = resultado;
           alert('Persona actualizada correctamente');
         } else {
-          this.mockPersonas.unshift(resultado); // Agrega al inicio
+          this.mockPersonas.unshift(resultado); 
           alert('Persona registrada correctamente');
         }
         this.cargarDatos(); 

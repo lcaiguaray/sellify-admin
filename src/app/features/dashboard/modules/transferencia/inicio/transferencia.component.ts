@@ -13,6 +13,7 @@ import { RouterLink } from '@angular/router';
 
 import { AlertDialogComponent } from '@app/features/components/alert-dialog/alert-dialog.component';
 import { NuevaTransferenciaDialogoComponent } from '../nueva-transferencia-dialog/nueva-transferencia-dialog.component';
+import { ProcesarTransferenciaDialogoComponent } from '../procesar-transferencia-dialog/procesar-transferencia-dialog.component';
 
 @Component({
   selector: 'app-transferencia',
@@ -35,7 +36,7 @@ export default class TransferenciaComponent implements OnInit {
   tablaColumnas: string[] = ['id', 'fecha', 'origen', 'destino', 'items', 'estado', 'acciones'];
   tablaPaginacion = signal<PageEvent>({ pageIndex: 0, pageSize: 10, length: 0 });
 
-  // --- MOCK DATA PROFESIONAL ---
+  
   private mockTransferencias: any[] = [
     { 
       id: 'TR-2026-001', fecha: new Date('2026-04-01T09:00:00'), 
@@ -104,45 +105,25 @@ export default class TransferenciaComponent implements OnInit {
   }
 
   procesarTransferencia(t: any) {
-    // Si eres almacenero, pasas de SOLICITADO -> DESPACHADO
-    if (t.estado === 'SOLICITADO') {
-      const dialogRef = this._dialog.open(AlertDialogComponent, {
-        width: '400px',
-        data: {
-          tipo: 'confirm',
-          titulo: '¿Despachar Mercancía?',
-          mensaje: `Vas a confirmar la salida de ${t.itemsCount} productos desde Almacén hacia ${t.destino}.`,
-          textoConfirmar: 'Sí, Despachar',
-          colorConfirmar: 'primary'
-        }
-      });
+    const dialogRef = this._dialog.open(ProcesarTransferenciaDialogoComponent, {
+    width: '600px',
+    panelClass: 'mat-dialog-lg',
+    data: { transferencia: t }
+  });
 
-      dialogRef.afterClosed().subscribe(ok => {
-        if (ok) {
-          this.actualizarEstado(t.id, 'DESPACHADO');
-          this._snackBar.open('Productos en tránsito', 'OK');
-        }
-      });
-    } 
-    // Si eres vendedora, pasas de DESPACHADO -> RECIBIDO
-    else if (t.estado === 'DESPACHADO') {
-      const dialogRef = this._dialog.open(AlertDialogComponent, {
-        width: '400px',
-        data: {
-          tipo: 'success',
-          titulo: '¿Mercancía Recibida?',
-          mensaje: `Confirma que has recibido los productos en el ${t.destino} para aumentar tu stock de venta.`,
-          textoConfirmar: 'Confirmar Recepción'
-        }
-      });
-
-      dialogRef.afterClosed().subscribe(ok => {
-        if (ok) {
-          this.actualizarEstado(t.id, 'RECIBIDO');
-          this._snackBar.open('Stock de mostrador actualizado', 'OK');
-        }
-      });
+  dialogRef.afterClosed().subscribe(confirmado => {
+    if (confirmado) {
+      if (t.estado === 'SOLICITADO') {
+        this.actualizarEstado(t.id, 'DESPACHADO');
+        this._snackBar.open('¡Productos despachados! El stock de Almacén ha sido rebajado.', 'OK');
+      } 
+      else if (t.estado === 'DESPACHADO') {
+        this.actualizarEstado(t.id, 'RECIBIDO');
+        this._snackBar.open('¡Productos recibidos! El stock de Mostrador ha sido aumentado.', 'OK');
+      }
     }
+  });
+    
   }
 
   private actualizarEstado(id: string, nuevoEstado: string) {

@@ -25,7 +25,6 @@ export class PersonaDialogComponent implements OnInit {
   readonly _dialogRef = inject(MatDialogRef<PersonaDialogComponent>);
   readonly data = inject<{ persona?: any }>(MAT_DIALOG_DATA);
 
-  // Formulario Reactivo
   formulario = new FormGroup({
     id: new FormControl(''),
     nombres: new FormControl('', Validators.required),
@@ -33,7 +32,7 @@ export class PersonaDialogComponent implements OnInit {
     apellidoMaterno: new FormControl(''),
     tipoDocumento: new FormControl('DNI', Validators.required),
     documento: new FormControl('', Validators.required),
-    roles: new FormControl<string[]>([], Validators.required), // Selección múltiple
+    roles: new FormControl<string[]>([], Validators.required), 
   });
 
   tiposDocumento = ['DNI', 'RUC', 'CE', 'PASAPORTE'];
@@ -54,15 +53,12 @@ export class PersonaDialogComponent implements OnInit {
       return;
     }
 
-    // Simulamos guardado
     const formData = this.formulario.value;
     
-    // Si es nuevo, le generamos un ID simulado
     if (!this.esEdicion) {
       formData.id = 'PER-' + Math.floor(Math.random() * 10000);
     }
 
-    // Retornamos la data al componente padre
     this._dialogRef.close(formData);
   }
 }

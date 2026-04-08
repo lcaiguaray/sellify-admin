@@ -24,13 +24,12 @@ export class ConvertirStockDialogComponent implements OnInit {
   presentacionesDisponibles: any[] = [];
 
   form = new FormGroup({
-    tipoOperacion: new FormControl('EMPACAR', Validators.required), // EMPACAR o DESEMPACAR
-    presentacion: new FormControl('', Validators.required), // Ej. CAJA
-    cantidadAConvertir: new FormControl(1, [Validators.required, Validators.min(1)]) // Cuántas cajas quiero armar o desarmar
+    tipoOperacion: new FormControl('EMPACAR', Validators.required), 
+    presentacion: new FormControl('', Validators.required), 
+    cantidadAConvertir: new FormControl(1, [Validators.required, Validators.min(1)]) 
   });
 
   ngOnInit() {
-    // Clonamos el producto para no alterar la tabla maestra hasta que le de a Guardar
     this.producto = JSON.parse(JSON.stringify(this.data.producto));
     this.presentacionesDisponibles = this.producto.equivalencias || [];
   }
@@ -75,10 +74,8 @@ export class ConvertirStockDialogComponent implements OnInit {
       });
       return;
     }
-    // ...
   }
 
-  // Al finalizar con éxito
   const dialogRef = this._dialog.open(AlertDialogComponent, {
     width: '400px',
     data: {

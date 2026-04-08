@@ -22,6 +22,8 @@ import { RouterLink } from '@angular/router';
 import { BuscarClienteDialogoComponent } from '../buscar-cliente-dialog/buscar-cliente-dialog';
 import { BuscarProductoDialogoComponent } from '../buscar-producto-dialog/buscar-producto-dialog';
 import { AlertDialogComponent } from '@app/features/components/alert-dialog/alert-dialog.component';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TicketsEsperaDialogoComponent } from '../tickets-espera-dialog/tickets-espera-dialog.component';
 
 @Component({
   selector: 'app-crear',
@@ -38,22 +40,24 @@ import { AlertDialogComponent } from '@app/features/components/alert-dialog/aler
     ReactiveFormsModule,
     MatCheckboxModule,
     RouterLink,
-    CommonModule
+    CommonModule,
+    MatSnackBarModule
   ],
 })
 export default class CrearComponent {
   @ViewChild('inputPago') inputPago!: ElementRef<HTMLInputElement>;
 
   readonly _dialog = inject(MatDialog);
+  private _snackBar = inject(MatSnackBar);
   private _document = inject(DOCUMENT);
 
   loading = signal(false);
   
-  // Usamos 'any' al no tener las interfaces
   conceptos = signal<any[]>([]);
   conceptoColumnas: string[] = ['nombre', 'cantidad', 'monto', 'total', 'acciones'];
 
   clienteSeleccionado = signal<any | null>(null);
+  ventasEnEspera = signal<any[]>([]);
 
   total = computed(() =>
     this.conceptos().reduce((sum, c) => sum + ((c.monto ?? 0) * c.cantidad), 0)
@@ -79,6 +83,7 @@ export default class CrearComponent {
       if (win) win.location.reload();
       return;
     }
+    if (e.key === 'F6') { e.preventDefault(); this.pausarVentaActual(); return; }
     if (e.key === 'Enter') {
       if (this._dialog.openDialogs.length > 0) return;
       e.preventDefault();
@@ -86,11 +91,75 @@ export default class CrearComponent {
     }
   }
 
+  pausarVentaActual() {
+    if (this.conceptos().length === 0) {
+      this._snackBar.open('No hay productos para poner en espera', 'Cerrar', { duration: 2000 });
+      return;
+    }
+
+    const ticketPausado = {
+      id: 'TKT-' + Math.floor(Math.random() * 10000),
+      hora: new Date(),
+      cliente: this.clienteSeleccionado(),
+      conceptos: [...this.conceptos()],
+      totalEstimado: this.total()
+    };
+
+    this.ventasEnEspera.update(lista => [...lista, ticketPausado]);
+    this.limpiarVenta();
+    this._snackBar.open('Venta puesta en espera (Pausada)', 'Cerrar', { duration: 3000 });
+  }
+
+  abrirGestorEspera() {
+    if (this.ventasEnEspera().length === 0) {
+      this._snackBar.open('No hay ventas en espera', 'Cerrar', { duration: 2000 });
+      return;
+    }
+
+    const dialogRef = this._dialog.open(TicketsEsperaDialogoComponent, {
+      width: '650px',
+      data: { tickets: this.ventasEnEspera() }
+    });
+
+    dialogRef.afterClosed().subscribe(ticketSeleccionado => {
+      if (ticketSeleccionado) {
+        this.recuperarVenta(ticketSeleccionado);
+      }
+    });
+  }
+
+  recuperarVenta(ticket: any) {
+    if (this.conceptos().length > 0) {
+      this._dialog.open(AlertDialogComponent, {
+        width: '400px',
+        data: {
+          tipo: 'warning',
+          titulo: 'Venta en curso',
+          mensaje: 'Cobra o pon en pausa los productos actuales antes de recuperar este ticket.'
+        }
+      });
+      return;
+    }
+
+    this.clienteSeleccionado.set(ticket.cliente);
+    this.conceptos.set(ticket.conceptos);
+    
+    this.ventasEnEspera.update(lista => lista.filter(t => t.id !== ticket.id));
+    this._snackBar.open('Venta recuperada correctamente.', 'OK', { duration: 2000 });
+  }
+
+  limpiarVenta() {
+    this.conceptos.set([]);
+    this.pago.set(0);
+    if (!this.mantenerDatos()) {
+      this.clienteSeleccionado.set(null);
+    }
+  }
+
   displayNombreCliente(cliente: any): string {
     if (!cliente) return '-';
     return `${cliente.nombres} ${cliente.apellidoPaterno} ${cliente.apellidoMaterno}`.trim();
   }
-  // --- MOCK: Simula la selección de un alumno ---
   buscarAlumnoDialogo() {
     this._dialog.closeAll();
     const dialogRef = this._dialog.open(BuscarClienteDialogoComponent, {
@@ -98,34 +167,28 @@ export default class CrearComponent {
       data: { cliente: this.clienteSeleccionado() },
     });
 
-    // Nos suscribimos para escuchar cuando se seleccione un cliente desde la tabla del modal
     dialogRef.afterOpened().subscribe(() => {
       dialogRef.componentInstance.clienteSeleccionado.subscribe((cliente: any) => {
         if (this.clienteSeleccionado()?.idCliente !== cliente?.idCliente) {
-          this.resumenPagos.set([]); // Reseteamos los pagos si cambia de cliente
+          this.resumenPagos.set([]); 
         }
         this.clienteSeleccionado.set(cliente);
       });
     });
   }
 
-  // --- MOCK: Simula la selección de un concepto ---
   buscarProductoDialogo() {
-    // IMPORTANTE: Asegúrate de importar el componente BuscarProductoDialogoComponent
     const dialogRef = this._dialog.open(BuscarProductoDialogoComponent, {
       panelClass: 'mat-dialog-lg',
-      // Le pasamos los productos que ya están en la tabla para que los marque de verde
       data: { productos: this.conceptos() }, 
     });
 
     dialogRef.afterOpened().subscribe(() => {
       dialogRef.componentInstance.productoSeleccionado.subscribe((producto: any) => {
-        // La misma lógica de toogle: si existe lo quita, si no, lo agrega
         this.conceptos.update((lista) => {
           const existe = lista.some((c) => c.id === producto.id);
           return existe
             ? lista.filter((c) => c.id !== producto.id)
-            // Ojo: cambiamos 'monto' por 'precio' al agregarlo
             : [...lista, { ...producto, monto: producto.precio, cantidad: 1 }]; 
         });
       });
@@ -148,7 +211,6 @@ export default class CrearComponent {
     );
   }
 
-  // --- MOCK: Simula el guardado en base de datos ---
   guardar() {
     if (!this.clienteSeleccionado()) {
     this._dialog.open(AlertDialogComponent, {
@@ -177,7 +239,6 @@ export default class CrearComponent {
   this.loading.set(true);
   
   setTimeout(() => {
-    // Éxito al guardar
     this._dialog.open(AlertDialogComponent, {
       width: '400px',
       data: {
@@ -188,7 +249,7 @@ export default class CrearComponent {
       }
     });
 
-    this.resumenPagos.update((pagos) => [...pagos, { /* data mock */ }]);
+    this.resumenPagos.update((pagos) => [...pagos, {  }]);
     this.pago.set(0);
     this.conceptos.set([]);
     if (!this.mantenerDatos()) this.clienteSeleccionado.set(null);

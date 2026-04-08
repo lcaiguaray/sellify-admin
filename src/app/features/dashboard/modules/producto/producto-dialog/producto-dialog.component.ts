@@ -24,7 +24,6 @@ export class ProductoDialogComponent implements OnInit {
     unidadBase: new FormControl('UNIDAD', Validators.required),
     precioBase: new FormControl(0, [Validators.required, Validators.min(0)]),
     stockBase: new FormControl(0, [Validators.required, Validators.min(0)]),
-    // Lista dinámica de presentaciones
     equivalencias: new FormArray([])
   });
 
@@ -39,7 +38,6 @@ export class ProductoDialogComponent implements OnInit {
       this.esEdicion = true;
       this.formulario.patchValue(this.data.producto);
       
-      // Llenar el FormArray dinámico
       this.data.producto.equivalencias?.forEach((eq: any) => {
         this.agregarEquivalencia(eq.unidad, eq.factor, eq.precio, eq.stock);
       });
@@ -49,7 +47,7 @@ export class ProductoDialogComponent implements OnInit {
   agregarEquivalencia(unidad = 'CAJA', factor = 12, precio = 0, stock = 0) {
     const eqForm = new FormGroup({
       unidad: new FormControl(unidad, Validators.required),
-      factor: new FormControl(factor, [Validators.required, Validators.min(2)]), // Ej: 1 Caja = 12 Unidades
+      factor: new FormControl(factor, [Validators.required, Validators.min(2)]), 
       precio: new FormControl(precio, [Validators.required, Validators.min(0)]),
       stock: new FormControl(stock, [Validators.required, Validators.min(0)])
     });

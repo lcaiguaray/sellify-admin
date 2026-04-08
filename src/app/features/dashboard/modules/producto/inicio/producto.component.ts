@@ -34,22 +34,22 @@ export default class ProductoComponent implements OnInit {
 
   tablaPaginacion = signal<PageEvent>({ pageIndex: 0, pageSize: 10, length: 0 });
 
-  // --- MOCK DATA CON EQUIVALENCIAS ---
+ 
   private mockProductos: any[] = [
     { 
       id: 'PROD-001', codigo: 'CHO-001', nombre: 'Chocolate Sublime Clásico', categoria: 'Chocolates', 
       unidadBase: 'UNIDAD', stockBase: 48, precioBase: 1.50,
-      equivalencias: [{ unidad: 'CAJA', factor: 24, precio: 30.00, stock: 2 }] // 2 Cajas en stock
+      equivalencias: [{ unidad: 'CAJA', factor: 24, precio: 30.00, stock: 2 }] 
     },
     { 
       id: 'PROD-002', codigo: 'GAL-001', nombre: 'Galletas Oreo', categoria: 'Galletas', 
       unidadBase: 'UNIDAD', stockBase: 12, precioBase: 1.20,
-      equivalencias: [{ unidad: 'PAQUETE', factor: 6, precio: 6.50, stock: 5 }] // 5 Paquetes de 6 en stock
+      equivalencias: [{ unidad: 'PAQUETE', factor: 6, precio: 6.50, stock: 5 }] 
     },
     { 
       id: 'PROD-003', codigo: 'CAR-001', nombre: 'Caramelos Limón', categoria: 'Caramelos', 
       unidadBase: 'UNIDAD', stockBase: 150, precioBase: 0.20,
-      equivalencias: [{ unidad: 'BOLSA', factor: 100, precio: 15.00, stock: 1 }] // 1 Bolsa de 100 en stock
+      equivalencias: [{ unidad: 'BOLSA', factor: 100, precio: 15.00, stock: 1 }] 
     },
   ];
 
@@ -81,11 +81,9 @@ export default class ProductoComponent implements OnInit {
         if (producto) {
           const index = this.mockProductos.findIndex(p => p.id === res.id);
           if (index !== -1) this.mockProductos[index] = res;
-          // REEMPLAZO DEL TOAST SUCCESS
           this._snackBar.open('Producto actualizado correctamente', 'Cerrar', { duration: 3000 });
         } else {
           this.mockProductos.unshift(res);
-          // REEMPLAZO DEL TOAST SUCCESS
           this._snackBar.open('Producto registrado correctamente', 'Cerrar', { duration: 3000 });
         }
         this.cargarDatos();
@@ -100,7 +98,6 @@ export default class ProductoComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((res) => {
       if (res) {
-        // En un caso real, aquí llamas a tu API. Por ahora actualizamos el mock local.
         const index = this.mockProductos.findIndex(p => p.id === producto.id);
         if (index !== -1) {
           this.mockProductos[index] = res.productoActualizado;
@@ -125,7 +122,6 @@ export default class ProductoComponent implements OnInit {
       if (confirmado) {
         this.mockProductos = this.mockProductos.filter(p => p.id !== producto.id);
         this.cargarDatos();
-        // REEMPLAZO DEL TOAST INFO
         this._snackBar.open('El producto ha sido eliminado', 'Cerrar', { duration: 3000 }); 
       }
     });

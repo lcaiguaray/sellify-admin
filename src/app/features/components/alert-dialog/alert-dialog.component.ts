@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 
-// Interfaz para tipar estrictamente la data que recibe el modal
 export interface AlertDialogData {
   titulo?: string;
   mensaje: string;
@@ -23,7 +22,6 @@ export interface AlertDialogData {
 export class AlertDialogComponent {
   data = inject<AlertDialogData>(MAT_DIALOG_DATA);
 
-  // Configuración dinámica del icono y colores según el tipo de alerta
   get iconoConfig() {
     switch (this.data.tipo) {
       case 'success': 
@@ -40,12 +38,10 @@ export class AlertDialogComponent {
     }
   }
 
-  // Define si el botón de cancelar debe mostrarse
   get mostrarCancelar(): boolean {
     if (this.data.mostrarCancelar !== undefined) {
       return this.data.mostrarCancelar;
     }
-    // Por defecto, solo muestra "Cancelar" si el tipo es 'confirm'
     return this.data.tipo === 'confirm';
   }
 }

@@ -67,12 +67,11 @@ export class BuscarProductoDialogoComponent implements OnInit {
   categoriaControl = new FormControl('');
   categorias = ['Todas', 'Chocolates', 'Snacks', 'Bebidas'];
 
-  // --- MOCK DATA: GOLOSINAS ---
   private readonly MOCK_PRODUCTOS = [
     { id: 'P001', codigo: 'CHO-001', nombre: 'Chocolate Sublime Clásico', categoria: 'Chocolates', precio: 1.50, stockMostrador: 24, stockAlmacen: 100 },
-    { id: 'P002', codigo: 'CHO-002', nombre: 'Triángulo D\'Onofrio', categoria: 'Chocolates', precio: 2.00, stockMostrador: 0, stockAlmacen: 50 }, // AGOTADO EN MOSTRADOR
+    { id: 'P002', codigo: 'CHO-002', nombre: 'Triángulo D\'Onofrio', categoria: 'Chocolates', precio: 2.00, stockMostrador: 0, stockAlmacen: 50 }, 
     { id: 'P003', codigo: 'SNK-001', nombre: 'Papitas Lays Clásicas', categoria: 'Snacks', precio: 2.50, stockMostrador: 10, stockAlmacen: 20 },
-    { id: 'P005', codigo: 'BEB-001', nombre: 'Inca Kola 500ml', categoria: 'Bebidas', precio: 3.00, stockMostrador: 0, stockAlmacen: 0 }, // AGOTADO TOTAL
+    { id: 'P005', codigo: 'BEB-001', nombre: 'Inca Kola 500ml', categoria: 'Bebidas', precio: 3.00, stockMostrador: 0, stockAlmacen: 0 }, 
   ];
 
   ngOnInit() {
@@ -100,7 +99,6 @@ export class BuscarProductoDialogoComponent implements OnInit {
     }
   }
 
-  // --- Lógica estática de Filtrado y Paginación ---
   handleFiltro() {
     const termino = (this.busquedaControl.value || '').toLowerCase();
     const categoria = this.categoriaControl.value;
@@ -118,7 +116,6 @@ export class BuscarProductoDialogoComponent implements OnInit {
   someProducto(producto: any) { return this.productos().some((p) => p.id === producto.id); }
 
 
-  // Agrega o quita el producto de la lista local y avisa al padre
   seleccionarProducto(producto: any) {
     if (producto.stockMostrador <= 0 && !this.someProducto(producto)) {
       this._dialog.open(AlertDialogComponent, {

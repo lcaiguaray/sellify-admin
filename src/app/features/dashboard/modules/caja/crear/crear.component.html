@@ -17,29 +17,65 @@
   </div>
 
   <div class="flex-auto px-4 pt-2 md:px-6 md:pt-4">
-    <div class="mb-4 flex flex-wrap items-center gap-2">
-      <div class="flex items-center gap-1">
-        <span class="rounded-md bg-slate-200 px-2 py-1 font-medium leading-none text-slate-900">F1</span>
-        <span class="text-md font-medium">Buscar Cliente</span>
+    
+    <div class="mb-4 flex flex-col-reverse md:flex-row md:items-center justify-between gap-4">
+  
+      <div class="flex flex-wrap items-center gap-2 md:gap-3 justify-center md:justify-start">
+        <button mat-stroked-button class="!rounded-lg !border-slate-300 md:hidden" (click)="buscarAlumnoDialogo()">
+          <span class="iconify tabler--user-search icon-size-5 mr-1"></span> Cliente
+        </button>
+        <button mat-stroked-button class="!rounded-lg !border-slate-300 md:hidden" (click)="buscarProductoDialogo()">
+          <span class="iconify tabler--search icon-size-5 mr-1"></span> Producto
+        </button>
+    
+        <div class="hidden md:flex items-center gap-3">
+          <div class="flex items-center gap-1">
+            <span class="rounded-md bg-slate-200 px-2 py-1 font-bold text-slate-800">F1</span>
+            <span class="text-sm font-medium">Cliente</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="rounded-md bg-slate-200 px-2 py-1 font-bold text-slate-800">F2</span>
+            <span class="text-sm font-medium">Productos</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="rounded-md bg-slate-200 px-2 py-1 font-bold text-slate-800">F3</span>
+            <span class="text-sm font-medium">Pago</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="rounded-md bg-amber-200 px-2 py-1 font-bold text-amber-900">F6</span>
+            <span class="text-sm font-medium text-slate-700">Pausar Venta</span>
+          </div>
+        </div>
       </div>
-      <div class="flex items-center gap-1">
-        <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">F2</span>
-        <span class="text-md font-medium">Buscar Articulos</span>
-      </div>
-      <div class="flex items-center gap-1">
-        <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">F3</span>
-        <span class="text-md font-medium">Ingresar Pago</span>
-      </div>
-      <div class="flex items-center gap-1">
-        <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">F4</span>
-        <span class="text-md font-medium">Actualizar</span>
-      </div>
-      <div class="flex items-center gap-1">
-        <span class="rounded-md bg-slate-200 px-2 py-1 text-md font-medium leading-none text-slate-900">Enter</span>
-        <span class="text-md font-medium">Guardar</span>
+    
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        
+        <button mat-flat-button color="accent" (click)="pausarVentaActual()" 
+                [disabled]="conceptos().length === 0" 
+                class="flex-1 md:flex-none !rounded-xl !py-6 md:!py-1 !text-base md:!text-sm">
+          <div class="flex items-center gap-1">
+            <span class="iconify tabler--player-pause-filled"></span>
+            <span class="hidden sm:inline">Pausar Ticket</span>
+            <span class="sm:hidden">Pausar</span>
+          </div>
+        </button>
+    
+        <button mat-flat-button color="primary" (click)="abrirGestorEspera()" 
+                class="flex-1 md:flex-none !rounded-xl !py-6 md:!py-1 relative !text-base md:!text-sm">
+          <div class="flex items-center gap-1">
+            <span class="iconify tabler--list-check"></span>
+            <span class="hidden sm:inline">Recuperar Venta</span>
+            <span class="sm:hidden">En Espera</span>
+          </div>
+          
+          @if (ventasEnEspera().length > 0) {
+            <span class="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-rose-500 text-white font-bold shadow-md animate-bounce">
+              {{ ventasEnEspera().length }}
+            </span>
+          }
+        </button>
       </div>
     </div>
-
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       
       <div>
@@ -49,7 +85,7 @@
               <span class="iconify icon-size-5 tabler--user-filled"></span>
               <span>Cliente</span>
             </div>
-            <span class="flex items-center justify-center rounded-md bg-slate-200 px-2 py-1 text-sm text-slate-900">F1</span>
+            <span class="flex items-center justify-center rounded-md bg-slate-200 px-2 py-1 text-sm text-slate-900 hidden md:flex">F1</span>
           </div>
 
           <div class="z-10 px-4 pb-4 pt-3 relative">
@@ -89,7 +125,7 @@
               <span class="iconify icon-size-5 clarity--dollar-bill-solid"></span>
               <span>Pago</span>
             </div>
-            <span class="flex items-center justify-center rounded-md bg-slate-200 px-2 py-1 text-sm text-slate-900">F3</span>
+            <span class="flex items-center justify-center rounded-md bg-slate-200 px-2 py-1 text-sm text-slate-900 hidden md:flex">F3</span>
           </div>
 
           <div class="z-10 px-4 pb-4 pt-3 relative">

@@ -1,0 +1,52 @@
+<div mat-dialog-title class="bg-amber-500 text-white px-4 md:px-6 py-4 flex items-center justify-between">
+  <div class="flex items-center gap-2 font-bold text-lg md:text-xl">
+    <span class="iconify tabler--clock-hour-4 text-2xl"></span>
+    Ventas en Espera ({{ data.tickets.length }})
+  </div>
+  <button mat-icon-button mat-dialog-close class="text-white hover:bg-white/20">
+    <span class="iconify tabler--x icon-size-6"></span>
+  </button>
+</div>
+
+<mat-dialog-content class="p-4 md:p-6 bg-slate-50">
+  @if (data.tickets.length === 0) {
+    <div class="flex flex-col items-center justify-center h-40 text-slate-400">
+      <span class="iconify tabler--mood-smile text-5xl mb-2"></span>
+      <span class="font-medium">No hay clientes en espera</span>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      @for (ticket of data.tickets; track ticket.id) {
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3 active:scale-[0.98] transition-transform cursor-pointer hover:border-amber-400"
+             (click)="seleccionarTicket(ticket)">
+          
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-bold text-slate-800 text-lg">
+                {{ ticket.cliente ? (ticket.cliente.nombres + ' ' + ticket.cliente.apellidoPaterno) : 'Público General' }}
+              </div>
+              <div class="text-xs font-mono text-slate-400 mt-0.5">{{ ticket.id }}</div>
+            </div>
+            <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1">
+              <span class="iconify tabler--clock text-[14px]"></span>
+              {{ ticket.hora | date:'HH:mm' }}
+            </span>
+          </div>
+
+          <div class="flex justify-between items-end border-t border-slate-100 pt-3 mt-1">
+            <div class="text-sm font-medium text-slate-500">
+              <span class="font-bold text-slate-700">{{ ticket.conceptos.length }}</span> productos
+            </div>
+            <div class="text-xl font-black text-emerald-600">
+              S/ {{ ticket.totalEstimado | number:'1.2-2' }}
+            </div>
+          </div>
+          
+          <button mat-flat-button color="primary" class="w-full !rounded-xl mt-2 !py-2">
+            Recuperar Venta
+          </button>
+        </div>
+      }
+    </div>
+  }
+</mat-dialog-content>

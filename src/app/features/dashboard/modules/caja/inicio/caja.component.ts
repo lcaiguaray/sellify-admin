@@ -60,17 +60,14 @@ export default class CajaComponent implements OnInit {
   tablaColumnas: string[] = ['documento', 'cliente', 'monto', 'fecha', 'tipo', 'estado', 'acciones'];
   footerTablaColumnas = ['documento', 'monto', 'fecha', 'tipo', 'estado', 'acciones'];
   
-  // Usamos 'any' ya que no tienes la interfaz Movimiento
   tablaData = signal<any[]>([]);
   tablaMontoTotal = signal<number>(0);
 
   busquedaControl = new FormControl('');
 
-  // Permisos y estados quemados directamente aquí
   permisosAuth = signal<string[]>(['COMPROBANTE_EMITIR']);
   estados = ['POR VALIDAR', 'PAGADO', 'ANULADO'];
 
-  // Datos 100% estáticos
   private readonly MOCK_DATA: any[] = [
     {
       idMovimiento: 'MOV-001',
