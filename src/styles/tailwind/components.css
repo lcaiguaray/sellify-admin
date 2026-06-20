@@ -1,0 +1,26 @@
+@import '../components/nova.css';
+
+.dashboard-nav-group-title {
+  @apply mt-4 mb-2 px-2 text-xs uppercase font-medium;
+}
+
+.dashboard-nav-item {
+  @apply flex items-center relative gap-2 rounded-lg px-2.5 h-9 tracking-wide cursor-pointer transition-all duration-300 hover:bg-sidebar-accent;
+}
+
+.dashboard-nav-collapse {
+  @apply flex items-center justify-between relative gap-2 rounded-lg px-2.5 h-9 tracking-wide cursor-pointer transition-all duration-300 hover:bg-sidebar-accent;
+}
+
+.dashboard-nav-item-indicator {
+  @apply bg-sidebar-accent w-0.5 h-full transition-all duration-300;
+}
+
+.dashboard-nav-item.dashboard-nav-active {
+    @apply bg-sidebar-accent;
+}
+
+.dashboard-nav-item:hover .dashboard-nav-item-indicator,
+.dashboard-nav-item.dashboard-nav-active .dashboard-nav-item-indicator {
+  @apply bg-sidebar-foreground h-[70%];
+}

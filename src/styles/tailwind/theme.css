@@ -1,0 +1,30 @@
+@theme {
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-dancing-script: 'Dancing Script', cursive;
+  --font-inter: 'Inter', sans-serif;
+
+  --breakpoint-3xl: 1600px;
+  --breakpoint-4xl: 2000px;
+
+  --spotlight-gradient: 68.54% 68.72% at 55.02% 31.46%, #d9d9d914 0, #8c8c8c05 50%, #73737300 80%;
+
+  --color-panel: var(--panel);
+  --color-panel-foreground: var(--panel-foreground);
+
+  --color-panel-muted: var(--panel-muted);
+  --color-panel-muted-foreground: var(--panel-muted-foreground);
+
+  --color-panel-accent: var(--panel-accent);
+  --color-panel-accent-foreground: var(--panel-accent-foreground);
+
+  --color-panel-border: var(--panel-border);
+  --color-panel-ring: var(--panel-ring);
+
+  --color-panel-card: var(--panel-card);
+  --color-panel-card-foreground: var(--panel-card-foreground);
+}
+
+/* @theme inline {
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+} */
