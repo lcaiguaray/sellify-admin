@@ -70,7 +70,13 @@
       "@ui-spartan/toggle-group": ["./src/app/ui/spartan/toggle-group/src/index.ts"],
       "@ui-spartan/tooltip": ["./src/app/ui/spartan/tooltip/src/index.ts"],
       "@ui-spartan/typography": ["./src/app/ui/spartan/typography/src/index.ts"],
-      "@ui-spartan/utils": ["./src/app/ui/spartan/utils/src/index.ts"]
+      "@ui-spartan/utils": ["./src/app/ui/spartan/utils/src/index.ts"],
+
+      "@core/*": ["./src/app/core/*"],
+      "@layouts/*": ["./src/app/layouts/*"],
+      "@modules/*": ["./src/app/modules/*"],
+      "@ui/*": ["./src/app/ui/*"],
+      "@env/*": ["./src/environments/*"],
     }
   },
   "angularCompilerOptions": {

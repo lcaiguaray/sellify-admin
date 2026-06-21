@@ -1,11 +1,13 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { HlmToasterImports } from '@ui-spartan/sonner';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
+  imports: [RouterOutlet, HlmToasterImports],
+  template: `
+    <router-outlet />
+    <hlm-toaster />
+  `,
 })
-export class App {
-  protected readonly title = signal('sellify-admin');
-}
+export class App {}

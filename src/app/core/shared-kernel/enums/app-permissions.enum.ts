@@ -1,0 +1,11 @@
+export enum AppPermission {
+  // Users
+  USER_READ = 'USER.READ',
+  USER_WRITE = 'USER.WRITE',
+  USER_MANAGE = 'USER.MANAGE',
+
+  // Orders
+  ORDERS_READ = 'ORDERS.READ',
+  ORDERS_WRITE = 'ORDERS.WRITE',
+  ORDERS_MANAGE = 'ORDERS.MANAGE',
+}
