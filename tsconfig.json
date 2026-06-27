@@ -13,6 +13,12 @@
     "module": "preserve",
     "rootDir": "src",
     "paths": {
+      "@ui-spartan/icon": ["./src/app/ui/spartan/icon/src/index.ts"],
+      "@core/*": ["./src/app/core/*"],
+      "@layouts/*": ["./src/app/layouts/*"],
+      "@modules/*": ["./src/app/modules/*"],
+      "@ui/*": ["./src/app/ui/*"],
+      "@env/*": ["./src/environments/*"],
       "@ui-spartan/accordion": ["./src/app/ui/spartan/accordion/src/index.ts"],
       "@ui-spartan/alert": ["./src/app/ui/spartan/alert/src/index.ts"],
       "@ui-spartan/alert-dialog": ["./src/app/ui/spartan/alert-dialog/src/index.ts"],
@@ -38,7 +44,6 @@
       "@ui-spartan/empty": ["./src/app/ui/spartan/empty/src/index.ts"],
       "@ui-spartan/field": ["./src/app/ui/spartan/field/src/index.ts"],
       "@ui-spartan/hover-card": ["./src/app/ui/spartan/hover-card/src/index.ts"],
-      "@ui-spartan/icon": ["./src/app/ui/spartan/icon/src/index.ts"],
       "@ui-spartan/input": ["./src/app/ui/spartan/input/src/index.ts"],
       "@ui-spartan/input-group": ["./src/app/ui/spartan/input-group/src/index.ts"],
       "@ui-spartan/input-otp": ["./src/app/ui/spartan/input-otp/src/index.ts"],
@@ -70,13 +75,7 @@
       "@ui-spartan/toggle-group": ["./src/app/ui/spartan/toggle-group/src/index.ts"],
       "@ui-spartan/tooltip": ["./src/app/ui/spartan/tooltip/src/index.ts"],
       "@ui-spartan/typography": ["./src/app/ui/spartan/typography/src/index.ts"],
-      "@ui-spartan/utils": ["./src/app/ui/spartan/utils/src/index.ts"],
-
-      "@core/*": ["./src/app/core/*"],
-      "@layouts/*": ["./src/app/layouts/*"],
-      "@modules/*": ["./src/app/modules/*"],
-      "@ui/*": ["./src/app/ui/*"],
-      "@env/*": ["./src/environments/*"],
+      "@ui-spartan/utils": ["./src/app/ui/spartan/utils/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

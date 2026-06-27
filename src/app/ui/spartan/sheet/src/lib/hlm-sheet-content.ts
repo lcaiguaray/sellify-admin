@@ -10,17 +10,17 @@ import {
   Renderer2,
   signal,
 } from '@angular/core';
-import { provideIcons } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 import { injectExposedSideProvider, injectExposesStateProvider } from '@spartan-ng/brain/core';
 import { HlmButton } from '@ui-spartan/button';
-import { HlmIconImports } from '@ui-spartan/icon';
+
 import { classes } from '@ui-spartan/utils';
 import { HlmSheetClose } from './hlm-sheet-close';
 
 @Component({
   selector: 'hlm-sheet-content',
-  imports: [HlmIconImports, HlmButton, HlmSheetClose],
+  imports: [HlmButton, HlmSheetClose, NgIcon],
   providers: [provideIcons({ lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
@@ -32,9 +32,9 @@ import { HlmSheetClose } from './hlm-sheet-close';
     <ng-content />
 
     @if (showCloseButton()) {
-      <button hlmBtn variant="ghost" size="icon-sm" class="absolute end-4 top-4" hlmSheetClose>
+      <button hlmBtn variant="ghost" size="icon-sm" class="absolute end-3 top-3" hlmSheetClose>
         <span class="sr-only">Close</span>
-        <ng-icon hlm size="sm" name="lucideX" />
+        <ng-icon name="lucideX" />
       </button>
     }
   `,

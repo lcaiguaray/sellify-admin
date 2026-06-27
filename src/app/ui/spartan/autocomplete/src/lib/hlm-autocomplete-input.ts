@@ -7,53 +7,47 @@ import {
   BrnAutocompleteClear,
   BrnAutocompleteInput,
 } from '@spartan-ng/brain/autocomplete';
-import { HlmInputGroupImports } from '@ui-spartan/input-group';
+import { HlmInputGroup, HlmInputGroupImports } from '@ui-spartan/input-group';
+import { classes } from '@ui-spartan/utils';
 
 @Component({
   selector: 'hlm-autocomplete-input',
-  imports: [
-    HlmInputGroupImports,
-    NgIcon,
-    BrnAutocompleteAnchor,
-    BrnAutocompleteClear,
-    BrnAutocompleteInput,
-  ],
+  imports: [HlmInputGroupImports, NgIcon, BrnAutocompleteClear, BrnAutocompleteInput],
   providers: [provideIcons({ lucideSearch, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [BrnAutocompleteAnchor, HlmInputGroup],
   template: `
-    <hlm-input-group brnAutocompleteAnchor class="w-auto">
-      <input
-        brnAutocompleteInput
-        #autocompleteInput="brnAutocompleteInput"
-        hlmInputGroupInput
-        [id]="inputId()"
-        [placeholder]="placeholder()"
-        [aria-invalid]="ariaInvalidOverride()"
-        [forceInvalid]="forceInvalid()"
-      />
+    <input
+      brnAutocompleteInput
+      #autocompleteInput="brnAutocompleteInput"
+      hlmInputGroupInput
+      [id]="inputId()"
+      [placeholder]="placeholder()"
+      [aria-invalid]="ariaInvalidOverride()"
+      [forceInvalid]="forceInvalid()"
+    />
 
-      @if (showSearch()) {
-        <hlm-input-group-addon>
-          <ng-icon name="lucideSearch" [class.opacity-50]="autocompleteInput.disabled()" />
-        </hlm-input-group-addon>
-      }
+    @if (showSearch()) {
+      <hlm-input-group-addon>
+        <ng-icon name="lucideSearch" [class.opacity-50]="autocompleteInput.disabled()" />
+      </hlm-input-group-addon>
+    }
 
-      @if (showClear()) {
-        <hlm-input-group-addon align="inline-end">
-          <button
-            *brnAutocompleteClear
-            hlmInputGroupButton
-            data-slot="autocomplete-clear"
-            [disabled]="autocompleteInput.disabled()"
-            size="icon-xs"
-            variant="ghost"
-          >
-            <ng-icon name="lucideX" />
-          </button>
-        </hlm-input-group-addon>
-      }
-      <ng-content />
-    </hlm-input-group>
+    @if (showClear()) {
+      <hlm-input-group-addon align="inline-end">
+        <button
+          *brnAutocompleteClear
+          hlmInputGroupButton
+          data-slot="autocomplete-clear"
+          [disabled]="autocompleteInput.disabled()"
+          size="icon-xs"
+          variant="ghost"
+        >
+          <ng-icon name="lucideX" />
+        </button>
+      </hlm-input-group-addon>
+    }
+    <ng-content />
   `,
 })
 export class HlmAutocompleteInput {
@@ -76,4 +70,8 @@ export class HlmAutocompleteInput {
     transform: (v: BooleanInput) => (v === '' || v === undefined ? undefined : booleanAttribute(v)),
     alias: 'aria-invalid',
   });
+
+  constructor() {
+    classes(() => 'w-auto');
+  }
 }

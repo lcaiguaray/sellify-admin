@@ -50,35 +50,34 @@ import { Brand } from '../../../domain/models/brand.model';
       </div>
     </div>
 
-    <hlm-card size="sm" class="mx-auto w-full">
-      <hlm-card-header>
-        <div class="flex items-center sm:justify-between gap-2">
-          <div>
-            <hlm-input-group>
-              <input
-                hlmInputGroupInput
-                placeholder="Search..."
-                [ngModel]="filters()?.search"
-                (ngModelChange)="onSearchChange($event)"
-              />
-              <hlm-input-group-addon>
-                <ng-icon name="hugeSearch01" />
-              </hlm-input-group-addon>
-            </hlm-input-group>
-          </div>
+    <div class="flex items-center mb-4 gap-2">
+      <div class="flex-1">
+        <hlm-input-group>
+          <input
+            hlmInputGroupInput
+            placeholder="Search..."
+            [ngModel]="filters()?.search"
+            (ngModelChange)="onSearchChange($event)"
+          />
+          <hlm-input-group-addon>
+            <ng-icon name="hugeSearch01" />
+          </hlm-input-group-addon>
+        </hlm-input-group>
+      </div>
 
-          <!-- <div>
-            <button hlmBtn>
-              <ng-icon name="hugeDownload03" />
-              <span class="hidden md:flex">Exportar</span>
-            </button>
-          </div> -->
-        </div>
-      </hlm-card-header>
-      <div hlmCardContent>
+      <div>
+        <button hlmBtn>
+          <ng-icon name="hugeDownload03" />
+          <span class="hidden md:flex">Exportar</span>
+        </button>
+      </div>
+    </div>
+
+    <hlm-card size="sm" class="w-full mb-4 p-0">
+      <div hlmCardContent class="p-0">
         <div hlmTableContainer>
           <table hlmTable>
-            <thead hlmTableHeader>
+            <thead hlmTableHeader class="bg-muted/50">
               <tr hlmTableRow>
                 <th hlmTableHead>Nombre</th>
                 <th hlmTableHead>Descripción</th>
@@ -96,16 +95,15 @@ import { Brand } from '../../../domain/models/brand.model';
           </table>
         </div>
       </div>
-      <hlm-card-footer>
-        <app-pagination
-          [pageSize]="pagination().pageSize"
-          [currentPage]="pagination().pageNumber + 1"
-          [totalPages]="pagination().totalPages"
-          (pageChanged)="onPageChange($event)"
-          (pageSizeChanged)="onPageSizeChange($event)"
-        />
-      </hlm-card-footer>
     </hlm-card>
+
+    <app-pagination
+      [pageSize]="pagination().pageSize"
+      [currentPage]="pagination().pageNumber + 1"
+      [totalPages]="pagination().totalPages"
+      (pageChanged)="onPageChange($event)"
+      (pageSizeChanged)="onPageSizeChange($event)"
+    />
   `,
 })
 export default class ListPage implements OnInit {

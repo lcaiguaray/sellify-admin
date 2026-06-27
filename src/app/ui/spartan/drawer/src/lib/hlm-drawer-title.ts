@@ -9,6 +9,6 @@ import { classes } from '@ui-spartan/utils';
 })
 export class HlmDrawerTitle {
   constructor() {
-    classes(() => 'text-foreground font-medium');
+    classes(() => 'text-foreground text-base font-medium');
   }
 }

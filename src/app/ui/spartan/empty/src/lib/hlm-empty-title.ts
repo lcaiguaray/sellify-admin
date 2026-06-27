@@ -7,6 +7,6 @@ import { classes } from '@ui-spartan/utils';
 })
 export class HlmEmptyTitle {
   constructor() {
-    classes(() => 'text-lg font-medium tracking-tight');
+    classes(() => 'text-sm font-medium tracking-tight');
   }
 }

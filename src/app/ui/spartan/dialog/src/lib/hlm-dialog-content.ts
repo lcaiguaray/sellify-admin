@@ -9,11 +9,11 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { provideIcons } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 import { BrnDialogRef, injectBrnDialogContext } from '@spartan-ng/brain/dialog';
 import { HlmButton } from '@ui-spartan/button';
-import { HlmIconImports } from '@ui-spartan/icon';
+
 import { classes } from '@ui-spartan/utils';
 import { HlmDialogClose } from './hlm-dialog-close';
 
@@ -25,7 +25,7 @@ type HlmDialogContentContext = {
 
 @Component({
   selector: 'hlm-dialog-content',
-  imports: [NgComponentOutlet, HlmIconImports, HlmButton, HlmDialogClose],
+  imports: [NgComponentOutlet, HlmButton, HlmDialogClose, NgIcon],
   providers: [provideIcons({ lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
@@ -40,9 +40,9 @@ type HlmDialogContentContext = {
     }
 
     @if (showCloseButton()) {
-      <button hlmBtn variant="ghost" size="icon-sm" class="absolute end-4 top-4" hlmDialogClose>
+      <button hlmBtn variant="ghost" size="icon-sm" class="absolute end-2 top-2" hlmDialogClose>
         <span class="sr-only">close</span>
-        <ng-icon hlm size="sm" name="lucideX" />
+        <ng-icon name="lucideX" />
       </button>
     }
   `,
@@ -67,7 +67,7 @@ export class HlmDialogContent {
 
   constructor() {
     classes(() => [
-      'bg-popover text-popover-foreground data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 ring-foreground/10 grid max-w-[calc(100%-2rem)] gap-6 rounded-xl p-6 text-sm ring-1 duration-100 sm:max-w-md relative mx-auto w-full outline-none sm:mx-0',
+      'bg-popover text-popover-foreground data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 ring-foreground/10 grid max-w-[calc(100%-2rem)] gap-4 rounded-xl p-4 text-sm ring-1 duration-100 sm:max-w-sm relative mx-auto w-full outline-none sm:mx-0',
       this._dynamicComponentClass,
     ]);
   }

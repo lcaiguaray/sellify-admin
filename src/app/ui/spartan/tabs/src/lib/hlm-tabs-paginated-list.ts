@@ -2,9 +2,9 @@ import { CdkObserveContent } from '@angular/cdk/observers';
 import {
   ChangeDetectionStrategy,
   Component,
-  type ElementRef,
   computed,
   contentChildren,
+  type ElementRef,
   input,
   viewChild,
 } from '@angular/core';
@@ -17,7 +17,6 @@ import {
   BrnTabsTrigger,
 } from '@spartan-ng/brain/tabs';
 import { buttonVariants } from '@ui-spartan/button';
-import { HlmIcon } from '@ui-spartan/icon';
 import { classes, hlm } from '@ui-spartan/utils';
 import type { ClassValue } from 'clsx';
 import type { Observable } from 'rxjs';
@@ -25,7 +24,7 @@ import { listVariants } from './hlm-tabs-list';
 
 @Component({
   selector: 'hlm-paginated-tabs-list',
-  imports: [CdkObserveContent, NgIcon, HlmIcon],
+  imports: [CdkObserveContent, NgIcon],
   providers: [provideIcons({ lucideChevronRight, lucideChevronLeft })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
@@ -46,7 +45,7 @@ import { listVariants } from './hlm-tabs-list';
       (mousedown)="_handlePaginatorPress('before', $event)"
       (touchend)="_stopInterval()"
     >
-      <ng-icon hlm size="base" name="lucideChevronLeft" />
+      <ng-icon name="lucideChevronLeft" />
     </button>
 
     <div
@@ -80,14 +79,14 @@ import { listVariants } from './hlm-tabs-list';
       (mousedown)="_handlePaginatorPress('after', $event)"
       (touchend)="_stopInterval()"
     >
-      <ng-icon hlm size="base" name="lucideChevronRight" />
+      <ng-icon name="lucideChevronRight" />
     </button>
   `,
 })
 export class HlmTabsPaginatedList extends BrnTabsPaginatedList {
   constructor() {
     super();
-    classes(() => 'relative flex flex-shrink-0 gap-1 overflow-hidden');
+    classes(() => 'relative flex flex-shrink-0 items-center gap-1 overflow-hidden');
   }
 
   public readonly items = contentChildren(BrnTabsTrigger, { descendants: false });
@@ -107,11 +106,11 @@ export class HlmTabsPaginatedList extends BrnTabsPaginatedList {
   public readonly tabListClass = input<ClassValue>('', { alias: 'tabListClass' });
   protected readonly _tabListClass = computed(() => hlm(listVariants(), this.tabListClass()));
 
-  public readonly paginationButtonClass = input<ClassValue>('', { alias: 'paginationButtonClass' });
+  public readonly paginationButtonClass = input<ClassValue>('');
   protected readonly _paginationButtonClass = computed(() =>
     hlm(
       'relative z-[2] select-none disabled:cursor-default',
-      buttonVariants({ variant: 'ghost', size: 'icon' }),
+      buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
       this.paginationButtonClass(),
     ),
   );

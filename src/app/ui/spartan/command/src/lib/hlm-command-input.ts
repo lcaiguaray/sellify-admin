@@ -15,7 +15,7 @@ import { classes } from '@ui-spartan/utils';
   },
   template: `
     <hlm-input-group
-      class="bg-input/30 border-input/30 h-8! rounded-lg! shadow-none! *:data-[slot=input-group-addon]:pl-2!"
+      class="bg-input/30 border-input/30 h-8! rounded-lg! shadow-none! *:data-[slot=input-group-addon]:ps-2!"
     >
       <input
         brnCommandInput
@@ -26,7 +26,7 @@ import { classes } from '@ui-spartan/utils';
       />
 
       <hlm-input-group-addon>
-        <ng-icon name="lucideSearch" class="shrink-0 text-[calc(var(--spacing)*4)] opacity-50" />
+        <ng-icon name="lucideSearch" class="shrink-0 text-[length:--spacing(4)] opacity-50" />
       </hlm-input-group-addon>
     </hlm-input-group>
   `,
