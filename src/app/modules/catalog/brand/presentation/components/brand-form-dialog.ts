@@ -34,9 +34,6 @@ import { Brand } from '../../domain/models/brand.model';
   template: `
     <hlm-dialog-header>
       <h3 hlmDialogTitle>Crear Marca</h3>
-      <p hlmDialogDescription>
-        This dialog has a sticky footer that stays visible while the content scrolls.
-      </p>
     </hlm-dialog-header>
     <div class="no-scrollbar -mx-4 max-h-[70vh] overflow-y-auto px-4">
       <form [formRoot]="form" id="form-create">

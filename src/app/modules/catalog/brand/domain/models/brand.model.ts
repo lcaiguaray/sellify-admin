@@ -14,8 +14,8 @@ export const BrandSearchableDefault: BrandSearchable = {
   page: 0,
   size: 10,
   search: '',
-  active: true,
-  sortBy: 'createdAt',
+  active: null,
+  sortBy: 'name',
   sortDir: 'desc',
 };
 

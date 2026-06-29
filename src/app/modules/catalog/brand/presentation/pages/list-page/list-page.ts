@@ -1,7 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, TemplateRef, viewChild } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmButtonImports } from '@ui-spartan/button';
-import { hugeDownload03, hugePlusSign, hugeSearch01 } from '@ng-icons/huge-icons';
+import { hugeDelete04, hugeDownload03, hugeEdit02 } from '@ng-icons/huge-icons';
 import { HlmCardImports } from '@ui-spartan/card';
 import { HlmInputImports } from '@ui-spartan/input';
 import TableRowSkeleton from '@ui/table-row-skeleton';
@@ -14,13 +14,20 @@ import { FormsModule } from '@angular/forms';
 import { BrandCreateDialog } from '../../components/brand-form-dialog';
 import { HlmDialogService } from '@ui-spartan/dialog';
 import { Pagination } from '@ui/pagination';
-import BrandTable from '../../components/brand-table';
 import { Brand } from '../../../domain/models/brand.model';
+import { PageHeader } from '@ui/page-header';
+import { ListToolbar } from '@ui/list-toolbar';
+import { DataTableComponent } from '@ui/data-table/data-table';
+import StatusBadge from '@ui/status-badge';
+import { HlmDropdownMenuImports } from '@ui/spartan/dropdown-menu/src';
+import { TableColumn } from '@ui/data-table/data-table.model';
+import { tablerDots, tablerLoader2 } from '@ng-icons/tabler-icons';
+import { mapHttpErrorToUiState, parseHttpError } from '@core/utils/http-error.util';
+import { toast } from '@spartan-ng/brain/sonner';
 
 @Component({
   selector: 'app-brand-list-page',
   imports: [
-    NgIcon,
     HlmButtonImports,
     HlmCardImports,
     HlmInputImports,
@@ -28,74 +35,93 @@ import { Brand } from '../../../domain/models/brand.model';
     HlmBadgeImports,
     HlmInputGroupImports,
     HlmSkeletonImports,
+    HlmDropdownMenuImports,
+    NgIcon,
     TableRowSkeleton,
-    BrandTable,
+    StatusBadge,
     Pagination,
     FormsModule,
+    PageHeader,
+    ListToolbar,
+    DataTableComponent,
   ],
-  providers: [provideIcons({ hugePlusSign, hugeDownload03, hugeSearch01 })],
+  providers: [
+    provideIcons({ hugeDownload03, tablerDots, hugeEdit02, hugeDelete04, tablerLoader2 }),
+  ],
   styleUrl: './list-page.css',
   template: `
-    <div class="flex flex-col gap-4 mb-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 class="text-xl font-bold">Listado de Marcas</h1>
-        <div>Gestione las marcas de su aplicación</div>
-      </div>
+    <app-page-header
+      class="mb-4"
+      title="Marcas"
+      description="Gestione las marcas de su aplicación"
+      actionLabel="Nueva Marca"
+      (action)="onOpenFormDialog()"
+    />
 
-      <div class="flex flex-col gap-2 md:flex-row md:items-center">
-        <button hlmBtn (click)="onOpenFormDialog()">
-          <ng-icon name="hugePlusSign" />
-          Nuevo
-        </button>
-      </div>
-    </div>
-
-    <div class="flex items-center mb-4 gap-2">
-      <div class="flex-1">
-        <hlm-input-group>
-          <input
-            hlmInputGroupInput
-            placeholder="Search..."
-            [ngModel]="filters()?.search"
-            (ngModelChange)="onSearchChange($event)"
-          />
-          <hlm-input-group-addon>
-            <ng-icon name="hugeSearch01" />
-          </hlm-input-group-addon>
-        </hlm-input-group>
-      </div>
-
-      <div>
-        <button hlmBtn>
-          <ng-icon name="hugeDownload03" />
-          <span class="hidden md:flex">Exportar</span>
-        </button>
-      </div>
-    </div>
+    <app-list-toolbar
+      class="mb-4"
+      [searchTerm]="filters()?.search"
+      (searchChange)="onSearchChange($event)"
+    >
+      <button hlmBtn variant="outline">
+        <ng-icon name="hugeDownload03" />
+        <span>Exportar</span>
+      </button>
+    </app-list-toolbar>
 
     <hlm-card size="sm" class="w-full mb-4 p-0">
       <div hlmCardContent class="p-0">
-        <div hlmTableContainer>
-          <table hlmTable>
-            <thead hlmTableHeader class="bg-muted/50">
-              <tr hlmTableRow>
-                <th hlmTableHead>Nombre</th>
-                <th hlmTableHead>Descripción</th>
-                <th hlmTableHead class="w-36 text-center">Estado</th>
-                <th hlmTableHead class="w-24 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody hlmTableBody>
-              @if (facade.isLoading()) {
-                <app-table-row-skeleton [rows]="1" [columns]="4" />
-              } @else {
-                <app-brand-table [data]="facade.data()" (edit)="onOpenFormDialog($event)" />
-              }
-            </tbody>
-          </table>
-        </div>
+        @if (isLoading()) {
+          <div hlmTableContainer class="overflow-x-auto w-full">
+            <app-table-row-skeleton [rows]="5" [columns]="4" />
+          </div>
+        } @else {
+          <app-data-table [data]="brands()" [columns]="tableColumns()" [error]="uiError()" />
+        }
       </div>
     </hlm-card>
+
+    <ng-template #nameCell let-brand>
+      <div class="flex flex-col">
+        <span class="font-medium text-foreground">{{ brand.name }}</span>
+        <span class="text-xs text-muted-foreground">{{ brand.slug }}</span>
+      </div>
+    </ng-template>
+
+    <ng-template #statusCell let-brand>
+      <app-status-badge [status]="brand.active" />
+    </ng-template>
+
+    <ng-template #actionsCell let-brand>
+      <button
+        hlmBtn
+        size="icon"
+        variant="outline"
+        [hlmDropdownMenuTrigger]="menuAction"
+        align="end"
+        class="h-8 w-8"
+        [disabled]="processingIds().has(brand.id)"
+      >
+        @if (processingIds().has(brand.id)) {
+          <ng-icon name="tablerLoader2" class="animate-spin text-muted-foreground" />
+        } @else {
+          <ng-icon name="tablerDots" class="text-muted-foreground" />
+        }
+      </button>
+
+      <ng-template #menuAction>
+        <hlm-dropdown-menu class="w-40">
+          <button hlmDropdownMenuItem (click)="onOpenFormDialog(brand)">
+            <ng-icon name="hugeEdit02" class="mr-2 h-4 w-4" /> Editar
+          </button>
+          <hlm-dropdown-menu-separator />
+          <button hlmDropdownMenuItem variant="destructive" (click)="onToggleStatus(brand)">
+            <ng-icon name="hugeDelete04" class="mr-2 h-4 w-4" />
+            {{ brand.active ? 'Deshabilitar' : 'Habilitar' }}
+          </button>
+        </hlm-dropdown-menu>
+      </ng-template>
+    </ng-template>
 
     <app-pagination
       [pageSize]="pagination().pageSize"
@@ -107,15 +133,53 @@ import { Brand } from '../../../domain/models/brand.model';
   `,
 })
 export default class ListPage implements OnInit {
-  readonly facade = inject(BrandFacade);
+  private readonly facade = inject(BrandFacade);
   private readonly dialogService = inject(HlmDialogService);
 
   readonly brands = this.facade.data;
   readonly isLoading = this.facade.isLoading;
-  readonly pagination = this.facade.pagination;
   readonly filters = this.facade.filters;
+  readonly pagination = this.facade.pagination;
+  readonly error = this.facade.error;
+  readonly processingIds = this.facade.processingIds;
+  readonly uiError = computed(() => mapHttpErrorToUiState(this.error()));
+
+  private readonly nameTemplate = viewChild.required<TemplateRef<any>>('nameCell');
+  private readonly statusTemplate = viewChild.required<TemplateRef<any>>('statusCell');
+  private readonly actionsTemplate = viewChild.required<TemplateRef<any>>('actionsCell');
+
+  readonly tableColumns = computed<TableColumn<Brand>[]>(() => [
+    {
+      key: 'name',
+      label: 'Nombre',
+      customTemplate: this.nameTemplate(),
+    },
+    {
+      key: 'description',
+      label: 'Descripción',
+      truncate: true,
+      customClass: 'max-w-[200px] md:max-w-[300px]',
+    },
+    {
+      key: 'status',
+      label: 'Estado',
+      align: 'center',
+      customTemplate: this.statusTemplate(),
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      align: 'center',
+      customTemplate: this.actionsTemplate(),
+      tdClass: 'w-24',
+    },
+  ]);
 
   ngOnInit(): void {
+    this.facade.load();
+  }
+
+  onReload() {
     this.facade.load();
   }
 
@@ -131,18 +195,21 @@ export default class ListPage implements OnInit {
     this.facade.changePageSize(value);
   }
 
-  toggleStatus(id: string, active: boolean) {
-    if (active) {
-      this.facade.disable(id);
-    } else {
-      this.facade.enable(id);
-    }
-  }
-
   onOpenFormDialog(brand?: Brand) {
     this.dialogService.open(BrandCreateDialog, {
       context: { brand: brand ?? null },
       disableClose: true,
     });
+  }
+
+  async onToggleStatus(brand: Brand) {
+    try {
+      const response = brand.active
+        ? await this.facade.disable(brand.id)
+        : await this.facade.enable(brand.id);
+      toast.success(response.message);
+    } catch (err: any) {
+      toast.error(parseHttpError(err));
+    }
   }
 }

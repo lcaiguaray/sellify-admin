@@ -15,13 +15,14 @@ export class BrandFacade {
   private readonly repository = inject(BrandRepository);
 
   readonly selected = signal<Brand | null>(null);
-  readonly filters = signal<BrandSearchable | undefined>(undefined);
+  readonly filters = signal<BrandSearchable>(BrandSearchableDefault);
 
   private readonly debouncedFilters = toSignal(
     toObservable(this.filters).pipe(
       debounceTime(300),
       distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
     ),
+    { initialValue: undefined },
   );
 
   readonly resource = rxResource({
@@ -29,27 +30,27 @@ export class BrandFacade {
     stream: ({ params }) => this.repository.get(params),
   });
 
-  readonly data = computed(() => this.resource.value()?.data.content ?? []);
+  readonly data = computed(() => {
+    if (this.resource.error()) return [];
+    return this.resource.value()?.data.content ?? [];
+  });
   readonly isLoading = computed(() => this.resource.isLoading());
   readonly hasData = computed(() => this.data().length > 0);
+  readonly error = computed(() => this.resource.error());
+  readonly processingIds = signal<Set<string>>(new Set<string>());
 
   readonly pagination = computed<PageMetadata>(() => {
-    const responseData = this.resource.value()?.data;
-    if (responseData) {
-      return {
-        pageNumber: responseData.pageNumber,
-        pageSize: responseData.pageSize,
-        totalElements: responseData.totalElements,
-        totalPages: responseData.totalPages,
-        isLast: responseData.isLast,
-      };
+    if (this.resource.error()) {
+      return { pageNumber: 0, pageSize: 10, totalElements: 0, totalPages: 0, isLast: true };
     }
+
+    const responseData = this.resource.value()?.data;
     return {
-      pageNumber: 0,
-      pageSize: 10,
-      totalElements: 0,
-      totalPages: 0,
-      isLast: true,
+      pageNumber: responseData?.pageNumber ?? 0,
+      pageSize: responseData?.pageSize ?? 10,
+      totalElements: responseData?.totalElements ?? 0,
+      totalPages: responseData?.totalPages ?? 0,
+      isLast: responseData?.isLast ?? true,
     };
   });
 
@@ -58,21 +59,17 @@ export class BrandFacade {
   }
 
   updateFilters(newFilters: Partial<BrandSearchable>) {
-    this.filters.update((current) =>
-      current ? { ...current, ...newFilters, page: 0 } : undefined,
-    );
+    this.filters.update((current) => ({ ...current, ...newFilters, page: 0 }));
   }
 
   changePage(page: number) {
     if (page < 0 || page > this.pagination().totalPages) return;
-    this.filters.update((current) => (current ? { ...current, page } : undefined));
+    this.filters.update((current) => ({ ...current, page }));
   }
 
   changePageSize(pageSize: number) {
     if (pageSize < 0) return;
-    this.filters.update((current) =>
-      current ? { ...current, size: pageSize, page: 0 } : undefined,
-    );
+    this.filters.update((current) => ({ ...current, size: pageSize, page: 0 }));
   }
 
   async create(payload: CreateBrand): Promise<ApiResponse<Brand>> {
@@ -113,18 +110,30 @@ export class BrandFacade {
     }
   }
 
-  async enable(id: Brand['id']) {
+  async enable(id: Brand['id']): Promise<ApiResponse<void>> {
+    this.setProcessing(id, true);
     try {
-      await firstValueFrom(this.repository.enable(id));
+      const response = await firstValueFrom(this.repository.enable(id));
       this.updateStatus(id, true);
-    } catch (err) {}
+      this.setProcessing(id, false);
+      return response;
+    } catch (err) {
+      this.setProcessing(id, false);
+      throw err;
+    }
   }
 
-  async disable(id: Brand['id']) {
+  async disable(id: Brand['id']): Promise<ApiResponse<void>> {
+    this.setProcessing(id, true);
     try {
-      await firstValueFrom(this.repository.disable(id));
+      const response = await firstValueFrom(this.repository.disable(id));
       this.updateStatus(id, false);
-    } catch (err) {}
+      this.setProcessing(id, false);
+      return response;
+    } catch (err) {
+      this.setProcessing(id, false);
+      throw err;
+    }
   }
 
   private updateStatus(id: Brand['id'], active: boolean) {
@@ -137,6 +146,14 @@ export class BrandFacade {
           content: current.data.content.map((b) => (b.id === id ? { ...b, active } : b)),
         },
       };
+    });
+  }
+
+  private setProcessing(id: string, isProcessing: boolean) {
+    this.processingIds.update((currentSet) => {
+      const newSet = new Set(currentSet);
+      isProcessing ? newSet.add(id) : newSet.delete(id);
+      return newSet;
     });
   }
 }

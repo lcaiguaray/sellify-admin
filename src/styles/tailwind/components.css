@@ -17,10 +17,18 @@
 }
 
 .dashboard-nav-item.dashboard-nav-active {
-    @apply bg-sidebar-accent;
+  @apply bg-sidebar-accent;
 }
 
 .dashboard-nav-item:hover .dashboard-nav-item-indicator,
 .dashboard-nav-item.dashboard-nav-active .dashboard-nav-item-indicator {
   @apply bg-sidebar-foreground h-[70%];
+}
+
+.cdk-global-overlay-wrapper .cdk-overlay-pane {
+  @apply w-full;
+}
+
+.cdk-global-overlay-wrapper .cdk-dialog-container {
+  @apply !flex justify-center;
 }

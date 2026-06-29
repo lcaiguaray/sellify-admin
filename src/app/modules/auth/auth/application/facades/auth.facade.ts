@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { catchError, firstValueFrom, Observable, of } from 'rxjs';
-import { UserAuth } from '../../domain/models/auth.model';
+import { AuthResponse, UserAuth } from '../../domain/models/auth.model';
 import { Role } from '@modules/auth/role';
 import { Company } from '@modules/core/company';
 import { UserCompany } from '../../domain/models/user-company.mode';
@@ -19,15 +19,19 @@ export class AuthFacade {
 
   readonly isAuthenticated = computed(() => this.user() !== null);
 
-  async login(payload: LoginFormModel) {
+  async login(payload: LoginFormModel): Promise<ApiResponse<AuthResponse>> {
     try {
-      const { data } = await firstValueFrom(this.repository.login(payload));
+      const response = await firstValueFrom(this.repository.login(payload));
+      const data = response.data;
 
       this.user.set({ ...data.user, permissions: data.permissions });
       this.role.set(data.role);
       this.company.set(data.company);
       this.companies.set(data.userCompanies);
-    } catch (err) {}
+      return response;
+    } catch (err) {
+      throw err;
+    }
   }
 
   async me() {
