@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { coolShield } from '@ng-icons/coolicons';
-import { hugePieChart } from '@ng-icons/huge-icons';
+import { hugePieChart, hugePackage, hugeStore01 } from '@ng-icons/huge-icons';
 import { lucideChevronRight } from '@ng-icons/lucide';
 import { matKeyboardArrowDownFillRound } from '@ng-icons/material-symbols/round';
 import { NavItem } from './nav-item';
@@ -11,7 +11,7 @@ import { NavigationItem } from '@core/shared-kernel/models/navigation-item.model
   selector: 'app-nav-group',
   imports: [NgIcon, NavItem],
   providers: [
-    provideIcons({ coolShield, hugePieChart, lucideChevronRight, matKeyboardArrowDownFillRound }),
+    provideIcons({ coolShield, hugePieChart, hugePackage, hugeStore01, lucideChevronRight, matKeyboardArrowDownFillRound }),
   ],
   template: `
     <li>

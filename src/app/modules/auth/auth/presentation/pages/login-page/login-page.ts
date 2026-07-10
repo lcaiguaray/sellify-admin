@@ -48,7 +48,7 @@ import { PlatformLogo } from '@ui/platform-logo';
 
         <div class="flex-1 flex flex-col justify-center z-10">
           <span
-            class="text-5xl text-panel-foreground font-semibold font-dancing-script tracking-wide mb-2"
+            class="text-5xl text-panel-foreground font-bold font-inter tracking-wide mb-2"
             >Todo tu <span class="text-primary">negocio</span> en un solo lugar.</span
           >
           <span class="text-xl text-panel-foreground/60 tracking-wide">

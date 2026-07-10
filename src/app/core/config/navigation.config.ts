@@ -15,13 +15,73 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   },
   {
     id: 'catalog',
-    label: 'Catálago',
+    label: 'Catálogo',
     children: [
+      {
+        id: 'catalog.category',
+        label: 'Categorías',
+        route: '/admin/catalog/categories',
+        icon: 'hugeFolder01',
+      },
       {
         id: 'catalog.brand',
         label: 'Marcas',
         route: '/admin/catalog/brands',
         icon: 'coolShield',
+      },
+      {
+        id: 'catalog.product',
+        label: 'Productos',
+        route: '/admin/catalog/products',
+        icon: 'hugePackage',
+      },
+      {
+        id: 'catalog.unit-measure',
+        label: 'Unidades Base',
+        route: '/admin/catalog/unit-measures',
+        icon: 'hugeScale',
+      },
+      {
+        id: 'catalog.unit-conversion',
+        label: 'Conv. Unidades',
+        route: '/admin/catalog/unit-conversions',
+        icon: 'hugeExchange01',
+      },
+    ],
+  },
+  {
+    id: 'inventory',
+    label: 'Inventario',
+    children: [
+      {
+        id: 'inventory.items',
+        label: 'Stock',
+        route: '/admin/inventory/items',
+        icon: 'hugeStore01',
+      },
+    ],
+  },
+  {
+    id: 'crm',
+    label: 'Directorio',
+    children: [
+      {
+        id: 'crm.contacts',
+        label: 'Contactos',
+        route: '/admin/crm/contacts',
+        icon: 'hugeUserGroup',
+      },
+    ],
+  },
+  {
+    id: 'sales',
+    label: 'Ventas',
+    children: [
+      {
+        id: 'sales.list',
+        label: 'Ventas',
+        route: '/admin/sales',
+        icon: 'hugeShoppingCart01',
       },
     ],
   },

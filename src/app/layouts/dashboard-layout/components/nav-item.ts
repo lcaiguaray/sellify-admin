@@ -3,14 +3,14 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NavigationItem } from '@core/shared-kernel/models/navigation-item.model';
 import { coolShield } from '@ng-icons/coolicons';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { hugePieChart } from '@ng-icons/huge-icons';
+import { hugePieChart, hugePackage, hugeStore01 } from '@ng-icons/huge-icons';
 import { HlmCollapsibleImports } from '@ui-spartan/collapsible';
 import { HlmSidebarImports } from '@ui-spartan/sidebar';
 
 @Component({
   selector: 'app-nav-item',
   imports: [HlmSidebarImports, NgIcon, HlmCollapsibleImports, RouterLink, RouterLinkActive],
-  providers: [provideIcons({ coolShield, hugePieChart })],
+  providers: [provideIcons({ coolShield, hugePieChart, hugePackage, hugeStore01 })],
   template: `
     <li>
       <a [routerLink]="item().route" routerLinkActive="dashboard-nav-active" class="dashboard-nav-item">
