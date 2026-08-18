@@ -12,11 +12,8 @@ import { UnitConversionApiDto } from './dtos/unit-conversion-api.dto';
 import { UnitConversionMapper } from './mappers/unit-conversion.mapper';
 
 @Injectable({ providedIn: 'root' })
-export class UnitConversionHttpService
-  extends BaseApiService
-  implements UnitConversionRepository
-{
-  private readonly resource = '/catalog/unit-conversions';
+export class UnitConversionHttpService extends BaseApiService implements UnitConversionRepository {
+  private readonly resource = '/core/uom-conversions';
 
   get(searchable: UnitConversionSearchable): Observable<ApiPageResponse<UnitConversion>> {
     const params = this.buildParams(searchable);
@@ -38,22 +35,36 @@ export class UnitConversionHttpService
 
   create(payload: CreateUnitConversion): Observable<ApiResponse<UnitConversion>> {
     const url = this.buildUrl(`${this.resource}`);
-    return this.http.post<ApiResponse<UnitConversionApiDto>>(url, payload).pipe(
-      map((response) => ({
-        ...response,
-        data: UnitConversionMapper.fromDto(response.data),
-      })),
-    );
+    return this.http
+      .post<ApiResponse<UnitConversionApiDto>>(url, {
+        productId: payload.productId || null,
+        fromUomId: payload.fromUnitId,
+        toUomId: payload.toUnitId,
+        multiplier: payload.factor,
+      })
+      .pipe(
+        map((response) => ({
+          ...response,
+          data: UnitConversionMapper.fromDto(response.data),
+        })),
+      );
   }
 
   update(unitConversion: UnitConversion): Observable<ApiResponse<UnitConversion>> {
     const url = this.buildUrl(`${this.resource}/${unitConversion.id}`);
-    return this.http.put<ApiResponse<UnitConversionApiDto>>(url, unitConversion).pipe(
-      map((response) => ({
-        ...response,
-        data: UnitConversionMapper.fromDto(response.data),
-      })),
-    );
+    return this.http
+      .put<ApiResponse<UnitConversionApiDto>>(url, {
+        productId: unitConversion.productId || null,
+        fromUomId: unitConversion.fromUnitId,
+        toUomId: unitConversion.toUnitId,
+        multiplier: unitConversion.factor,
+      })
+      .pipe(
+        map((response) => ({
+          ...response,
+          data: UnitConversionMapper.fromDto(response.data),
+        })),
+      );
   }
 
   enable(id: UnitConversion['id']): Observable<ApiResponse<void>> {

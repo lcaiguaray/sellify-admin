@@ -2,14 +2,18 @@ import { Injectable } from '@angular/core';
 import { BaseApiService } from '@core/services/base-api.service';
 import { map, Observable } from 'rxjs';
 import { UnitMeasureRepository } from './../domain/repositories/unit-measure.repository';
-import { UnitMeasure, UnitMeasureSearchable, CreateUnitMeasure } from './../domain/models/unit-measure.model';
+import {
+  UnitMeasure,
+  UnitMeasureSearchable,
+  CreateUnitMeasure,
+} from './../domain/models/unit-measure.model';
 import { ApiPageResponse, ApiResponse } from '@core/shared-kernel/models/api-response.model';
 import { UnitMeasureApiDto } from './dtos/unit-measure-api.dto';
 import { UnitMeasureMapper } from './mappers/unit-measure.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class UnitMeasureHttpService extends BaseApiService implements UnitMeasureRepository {
-  private readonly resource = '/catalog/unit-measures';
+  private readonly resource = '/core/uoms';
 
   get(searchable: UnitMeasureSearchable): Observable<ApiPageResponse<UnitMeasure>> {
     const params = this.buildParams(searchable);

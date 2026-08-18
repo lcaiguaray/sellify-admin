@@ -6,8 +6,10 @@ export const UnitMeasureMapper = {
     if (!dto) return {} as UnitMeasure;
     return {
       id: dto.id,
+      code: dto.code,
       name: dto.name,
-      abbreviation: dto.abbreviation,
+      taxCode: dto.taxCode,
+      symbol: dto.symbol,
       description: dto.description,
       active: dto.active,
       createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
@@ -19,8 +21,10 @@ export const UnitMeasureMapper = {
     if (!model) return null;
     return {
       id: model.id,
+      code: model.code,
       name: model.name,
-      abbreviation: model.abbreviation,
+      taxCode: model.taxCode,
+      symbol: model.symbol,
       description: model.description,
       active: model.active,
     };

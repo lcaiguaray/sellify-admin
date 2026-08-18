@@ -1,5 +1,6 @@
 export interface CategoryApiDto {
   id: string;
+  parentId: string | null;
   name: string;
   slug: string;
   description?: string;

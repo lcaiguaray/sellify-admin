@@ -1,14 +1,20 @@
 import { Injectable } from '@angular/core';
 import { delay, Observable, of } from 'rxjs';
 import { UnitMeasureRepository } from '../domain/repositories/unit-measure.repository';
-import { UnitMeasure, UnitMeasureSearchable, CreateUnitMeasure } from '../domain/models/unit-measure.model';
+import {
+  UnitMeasure,
+  UnitMeasureSearchable,
+  CreateUnitMeasure,
+} from '../domain/models/unit-measure.model';
 import { ApiPageResponse, ApiResponse } from '@core/shared-kernel/models/api-response.model';
 
 const MOCK_UNIT_MEASURES: UnitMeasure[] = [
   {
     id: '1',
+    code: 'NIU',
     name: 'Unidad',
-    abbreviation: 'und',
+    taxCode: 'NIU',
+    symbol: 'und',
     description: 'Unidad base suelta',
     active: true,
     createdAt: new Date('2024-01-10'),
@@ -16,8 +22,10 @@ const MOCK_UNIT_MEASURES: UnitMeasure[] = [
   },
   {
     id: '2',
+    code: 'PK',
     name: 'Paquete',
-    abbreviation: 'paq',
+    taxCode: 'PK',
+    symbol: 'paq',
     description: 'Paquete de productos',
     active: true,
     createdAt: new Date('2024-01-12'),
@@ -25,8 +33,10 @@ const MOCK_UNIT_MEASURES: UnitMeasure[] = [
   },
   {
     id: '3',
+    code: 'BX',
     name: 'Caja',
-    abbreviation: 'cja',
+    taxCode: 'BX',
+    symbol: 'cja',
     description: 'Caja que contiene múltiples paquetes',
     active: true,
     createdAt: new Date('2024-01-15'),
@@ -34,8 +44,10 @@ const MOCK_UNIT_MEASURES: UnitMeasure[] = [
   },
   {
     id: '4',
+    code: 'CR',
     name: 'Cajón',
-    abbreviation: 'cjn',
+    taxCode: 'CR',
+    symbol: 'cjn',
     description: 'Cajón mayorista',
     active: true,
     createdAt: new Date('2024-02-01'),
@@ -43,8 +55,10 @@ const MOCK_UNIT_MEASURES: UnitMeasure[] = [
   },
   {
     id: '5',
+    code: 'DSP',
     name: 'Display',
-    abbreviation: 'dsp',
+    taxCode: 'DSP',
+    symbol: 'dsp',
     description: 'Display exhibidor para mostrador',
     active: true,
     createdAt: new Date('2024-02-10'),
@@ -52,8 +66,10 @@ const MOCK_UNIT_MEASURES: UnitMeasure[] = [
   },
   {
     id: '6',
+    code: 'BG',
     name: 'Bolsa',
-    abbreviation: 'bls',
+    taxCode: 'BG',
+    symbol: 'bls',
     description: 'Bolsa de productos a granel',
     active: true,
     createdAt: new Date('2024-03-01'),
@@ -73,7 +89,8 @@ export class UnitMeasureMockService implements UnitMeasureRepository {
       filtered = filtered.filter(
         (u) =>
           u.name.toLowerCase().includes(term) ||
-          u.abbreviation.toLowerCase().includes(term) ||
+          u.code.toLowerCase().includes(term) ||
+          u.symbol.toLowerCase().includes(term) ||
           (u.description && u.description.toLowerCase().includes(term)),
       );
     }

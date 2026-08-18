@@ -41,12 +41,19 @@ export class CategoryHttpService extends BaseApiService implements CategoryRepos
 
   update(category: Category): Observable<ApiResponse<Category>> {
     const url = this.buildUrl(`${this.resource}/${category.id}`);
-    return this.http.put<ApiResponse<CategoryApiDto>>(url, category).pipe(
-      map((response) => ({
-        ...response,
-        data: CategoryMapper.fromDto(response.data),
-      })),
-    );
+    return this.http
+      .put<ApiResponse<CategoryApiDto>>(url, {
+        parentId: category.parentId,
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+      })
+      .pipe(
+        map((response) => ({
+          ...response,
+          data: CategoryMapper.fromDto(response.data),
+        })),
+      );
   }
 
   enable(id: Category['id']): Observable<ApiResponse<void>> {

@@ -1,13 +1,12 @@
+import { UnitMeasureApiDto } from '@modules/catalog/unit-measure';
+
 export interface UnitConversionApiDto {
   id: string;
-  productId: string;
-  productName?: string;
-  fromUnitId: string;
-  fromUnitName?: string;
-  toUnitId: string;
-  toUnitName?: string;
-  factor: number;
-  active: boolean;
+  product: { id: string; name: string; sku: string | null } | null;
+  fromUom: UnitMeasureApiDto;
+  toUom: UnitMeasureApiDto;
+  multiplier: number;
+  active?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -10,15 +10,13 @@ import { form, required, FormRoot, FormField, min } from '@angular/forms/signals
 import { HlmNativeSelectImports } from '@ui-spartan/native-select';
 import { BrnDialogRef, injectBrnDialogContext } from '@spartan-ng/brain/dialog';
 import { UnitConversionFacade } from '../../application/facades/unit-conversion.facade';
-import { ProductFacade } from '@modules/catalog/product';
 import { UnitMeasureFacade } from '@modules/catalog/unit-measure';
 import { parseHttpError } from '@core/utils/http-error.util';
 import { HlmSpinner } from '@ui-spartan/spinner';
 import { toast } from '@spartan-ng/brain/sonner';
-import { UnitConversion, UnitConversionSearchableDefault } from '../../domain/models/unit-conversion.model';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { UnitConversionRepository } from '../../domain/repositories/unit-conversion.repository';
-import { map, of } from 'rxjs';
+import { UnitConversion } from '../../domain/models/unit-conversion.model';
+import { ProductFacade } from '@modules/catalog/product';
+import { AuthFacade } from '@modules/auth';
 
 @Component({
   selector: 'app-unit-conversion-form-dialog',
@@ -39,28 +37,39 @@ import { map, of } from 'rxjs';
   template: `
     <hlm-dialog-header>
       <h3 hlmDialogTitle>{{ data ? 'Editar' : 'Crear' }} Conversión de Unidades</h3>
-      <p hlmDialogDescription>
-        Especifique el factor de conversión entre dos unidades para un producto.
-      </p>
+      <p hlmDialogDescription>Especifique el factor de conversión entre dos unidades.</p>
     </hlm-dialog-header>
     <div class="no-scrollbar -mx-4 max-h-[70vh] overflow-y-auto px-4">
       <form [formRoot]="form" id="form-create-unit-conversion">
         <hlm-field-group>
-          <hlm-field>
-            <label hlmFieldLabel>Producto</label>
-            <select hlmNativeSelect [formField]="form.productId">
-              <option value="" disabled>Seleccione un producto</option>
-              @for (product of products(); track product.id) {
-                <option [value]="product.id">{{ product.name }} ({{ product.sku }})</option>
-              }
-            </select>
-
-            @for (error of form.productId().errors(); track error) {
-              <hlm-field-error [validator]="error.kind">
-                {{ error.message }}
-              </hlm-field-error>
-            }
-          </hlm-field>
+          @if (data) {
+            <div class="rounded-lg border border-border bg-muted/40 px-4 py-3">
+              <p class="text-sm font-medium">{{ data.productName || 'Conversión general' }}</p>
+              <p class="text-xs text-muted-foreground">
+                La asociación al producto se conserva durante la edición.
+              </p>
+            </div>
+          } @else if (canReadProducts()) {
+            <hlm-field>
+              <label hlmFieldLabel>Producto (opcional)</label>
+              <select hlmNativeSelect [formField]="form.productId">
+                <option value="">Conversión general</option>
+                @for (product of products(); track product.id) {
+                  <option [value]="product.id">{{ product.name }}</option>
+                }
+              </select>
+              <span class="mt-1 text-xs text-muted-foreground">
+                Seleccione un producto cuando la equivalencia sea específica para él.
+              </span>
+            </hlm-field>
+          } @else {
+            <div class="rounded-lg border border-border bg-muted/40 px-4 py-3">
+              <p class="text-sm font-medium">Conversión general</p>
+              <p class="text-xs text-muted-foreground">
+                No dispone del permiso necesario para consultar productos.
+              </p>
+            </div>
+          }
 
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <hlm-field>
@@ -120,7 +129,7 @@ import { map, of } from 'rxjs';
 
           @if (conversionSummary()) {
             <div class="p-4 bg-muted/50 rounded-lg border border-border mt-2">
-              <h4 class="text-sm font-semibold mb-1">💡 Pre-visualización</h4>
+              <h4 class="text-sm font-semibold mb-1">Vista previa</h4>
               <p class="text-sm text-muted-foreground">{{ conversionSummary() }}</p>
             </div>
           }
@@ -137,7 +146,12 @@ import { map, of } from 'rxjs';
       >
         Cerrar
       </button>
-      <button hlmBtn type="submit" form="form-create-unit-conversion" [disabled]="form().submitting()">
+      <button
+        hlmBtn
+        type="submit"
+        form="form-create-unit-conversion"
+        [disabled]="form().submitting()"
+      >
         @if (form().submitting()) {
           <hlm-spinner data-icon="inline-start" />
         }
@@ -148,13 +162,14 @@ import { map, of } from 'rxjs';
 })
 export class UnitConversionCreateDialog {
   private readonly conversionFacade = inject(UnitConversionFacade);
-  private readonly conversionRepository = inject(UnitConversionRepository);
-  private readonly productFacade = inject(ProductFacade);
   private readonly unitMeasureFacade = inject(UnitMeasureFacade);
+  private readonly productFacade = inject(ProductFacade);
+  private readonly auth = inject(AuthFacade);
   private readonly dialogRef = inject<BrnDialogRef<null>>(BrnDialogRef);
 
-  readonly products = this.productFacade.data;
   readonly unitMeasures = this.unitMeasureFacade.data;
+  readonly products = this.productFacade.data;
+  readonly canReadProducts = computed(() => this.auth.hasPermission('PRODUCT.READ'));
 
   private readonly _dialogContext = injectBrnDialogContext<{ conversion: UnitConversion }>();
   protected readonly data = this._dialogContext.conversion;
@@ -169,7 +184,6 @@ export class UnitConversionCreateDialog {
   public readonly form = form(
     this.formModel,
     (schema) => {
-      required(schema.productId, { message: 'El campo es requerido' });
       required(schema.fromUnitId, { message: 'El campo es requerido' });
       required(schema.toUnitId, { message: 'El campo es requerido' });
       required(schema.factor, { message: 'El campo es requerido' });
@@ -204,53 +218,27 @@ export class UnitConversionCreateDialog {
     },
   );
 
-  readonly productConversionsResource = rxResource({
-    params: () => this.form.productId().value(),
-    stream: ({ params: productId }) => {
-      if (!productId) return of([]);
-      return this.conversionRepository.get({ ...UnitConversionSearchableDefault, productId, size: 100 })
-        .pipe(map(res => res.data.content));
-    }
-  });
-
   readonly conversionSummary = computed(() => {
     const fromId = this.form.fromUnitId().value();
     const toId = this.form.toUnitId().value();
     const factor = this.form.factor().value();
-    const existing = this.productConversionsResource.value() ?? [];
-    
     if (!fromId || !toId || !factor) return null;
 
-    const fromUnit = this.unitMeasures().find(u => u.id === fromId);
-    const toUnit = this.unitMeasures().find(u => u.id === toId);
+    const fromUnit = this.unitMeasures().find((u) => u.id === fromId);
+    const toUnit = this.unitMeasures().find((u) => u.id === toId);
 
     if (!fromUnit || !toUnit) return null;
 
-    let summary = `1 ${fromUnit.name} = ${factor} ${toUnit.name}`;
-
-    // Buscar si la unidad destino tiene una conversión adicional (ej: Caja -> Paquete)
-    const nextConversion = existing.find(c => c.fromUnitId === toId);
-    if (nextConversion) {
-      const nextFactor = nextConversion.factor;
-      const totalFactor = factor * nextFactor;
-      summary += ` = ${totalFactor} ${nextConversion.toUnitName}`;
-      
-      // Buscar un tercer nivel (ej: Paquete -> Unidad)
-      const level3Conversion = existing.find(c => c.fromUnitId === nextConversion.toUnitId);
-      if (level3Conversion) {
-        const totalLevel3 = totalFactor * level3Conversion.factor;
-        summary += ` = ${totalLevel3} ${level3Conversion.toUnitName}`;
-      }
-    }
-
-    return summary;
+    return `1 ${fromUnit.name} = ${factor} ${toUnit.name}`;
   });
 
   constructor() {
-    this.productFacade.updateFilters({ size: 1000 });
-    this.productFacade.load();
-    this.unitMeasureFacade.updateFilters({ size: 100 });
     this.unitMeasureFacade.load();
+    this.unitMeasureFacade.updateFilters({ size: 100, active: true });
+    if (!this.data && this.canReadProducts()) {
+      this.productFacade.load();
+      this.productFacade.updateFilters({ size: 100, active: true, sortBy: 'name', sortDir: 'asc' });
+    }
   }
 
   public close() {

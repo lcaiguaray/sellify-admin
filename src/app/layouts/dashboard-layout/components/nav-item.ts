@@ -3,17 +3,44 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NavigationItem } from '@core/shared-kernel/models/navigation-item.model';
 import { coolShield } from '@ng-icons/coolicons';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { hugePieChart, hugePackage, hugeStore01 } from '@ng-icons/huge-icons';
+import {
+  hugeDatabase01,
+  hugeExchange01,
+  hugeFolder01,
+  hugePackage,
+  hugePieChart,
+  hugeWeightScale,
+  hugeShoppingCart01,
+  hugeStore01,
+  hugeUserGroup,
+} from '@ng-icons/huge-icons';
 import { HlmCollapsibleImports } from '@ui-spartan/collapsible';
 import { HlmSidebarImports } from '@ui-spartan/sidebar';
 
 @Component({
   selector: 'app-nav-item',
   imports: [HlmSidebarImports, NgIcon, HlmCollapsibleImports, RouterLink, RouterLinkActive],
-  providers: [provideIcons({ coolShield, hugePieChart, hugePackage, hugeStore01 })],
+  providers: [
+    provideIcons({
+      coolShield,
+      hugeDatabase01,
+      hugeExchange01,
+      hugeFolder01,
+      hugePackage,
+      hugePieChart,
+      hugeWeightScale,
+      hugeShoppingCart01,
+      hugeStore01,
+      hugeUserGroup,
+    }),
+  ],
   template: `
     <li>
-      <a [routerLink]="item().route" routerLinkActive="dashboard-nav-active" class="dashboard-nav-item">
+      <a
+        [routerLink]="item().route"
+        routerLinkActive="dashboard-nav-active"
+        class="dashboard-nav-item"
+      >
         @if (useIndicator()) {
           <div class="flex items-center justify-center w-5 h-full">
             <div class="dashboard-nav-item-indicator"></div>

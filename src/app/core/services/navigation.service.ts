@@ -39,7 +39,12 @@ export class NavigationService {
       const clonedItem: NavigationItem = { ...item, expanded: false };
 
       if (clonedItem.children && clonedItem.children.length > 0) {
+        const hadChildren = clonedItem.children.length > 0;
         clonedItem.children = this.buildMenu(clonedItem.children, userPermissions);
+
+        if (hadChildren && clonedItem.children.length === 0) {
+          continue;
+        }
 
         if (clonedItem.children.some((child) => child.expanded)) {
           clonedItem.expanded = true;

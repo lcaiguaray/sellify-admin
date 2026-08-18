@@ -1,7 +1,7 @@
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
 import { ProductRepository } from '../../domain/repositories/product.repository';
-import { ProductMockService } from '../product-mock.service';
+import { ProductHttpService } from '../product-http.service';
 
 export function provideProduct(): EnvironmentProviders {
-  return makeEnvironmentProviders([{ provide: ProductRepository, useClass: ProductMockService }]);
+  return makeEnvironmentProviders([{ provide: ProductRepository, useClass: ProductHttpService }]);
 }

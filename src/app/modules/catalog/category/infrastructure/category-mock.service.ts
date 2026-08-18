@@ -7,6 +7,7 @@ import { ApiPageResponse, ApiResponse } from '@core/shared-kernel/models/api-res
 const MOCK_CATEGORIES: Category[] = [
   {
     id: '1',
+    parentId: null,
     name: 'Snacks Salados',
     slug: 'snacks-salados',
     description: 'Papas fritas, chizitos, doritos y snacks salados en general',
@@ -16,6 +17,7 @@ const MOCK_CATEGORIES: Category[] = [
   },
   {
     id: '2',
+    parentId: null,
     name: 'Chocolates',
     slug: 'chocolates',
     description: 'Barras de chocolate, bombones y tabletas',
@@ -25,6 +27,7 @@ const MOCK_CATEGORIES: Category[] = [
   },
   {
     id: '3',
+    parentId: null,
     name: 'Galletas',
     slug: 'galletas',
     description: 'Galletas dulces, saladas, rellenas y wafers',
@@ -34,6 +37,7 @@ const MOCK_CATEGORIES: Category[] = [
   },
   {
     id: '4',
+    parentId: null,
     name: 'Golosinas',
     slug: 'golosinas',
     description: 'Caramelos, gomitas, chupetines y dulces varios',
@@ -43,6 +47,7 @@ const MOCK_CATEGORIES: Category[] = [
   },
   {
     id: '5',
+    parentId: null,
     name: 'Bebidas',
     slug: 'bebidas',
     description: 'Gaseosas, jugos, aguas y bebidas energéticas',
@@ -52,6 +57,7 @@ const MOCK_CATEGORIES: Category[] = [
   },
   {
     id: '6',
+    parentId: null,
     name: 'Frutos Secos',
     slug: 'frutos-secos',
     description: 'Maní, almendras, nueces y mix de frutos secos',

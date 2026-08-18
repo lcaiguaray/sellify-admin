@@ -6,6 +6,7 @@ export const CategoryMapper = {
     if (!dto) return {} as Category;
     return {
       id: dto.id,
+      parentId: dto.parentId,
       name: dto.name,
       slug: dto.slug,
       description: dto.description,
@@ -19,6 +20,7 @@ export const CategoryMapper = {
     if (!model) return null;
     return {
       id: model.id,
+      parentId: model.parentId,
       name: model.name,
       slug: model.slug,
       description: model.description,

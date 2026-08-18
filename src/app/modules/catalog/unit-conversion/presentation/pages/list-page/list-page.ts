@@ -24,6 +24,7 @@ import { TableColumn } from '@ui/data-table/data-table.model';
 import { tablerDots, tablerLoader2, tablerArrowRight } from '@ng-icons/tabler-icons';
 import { mapHttpErrorToUiState, parseHttpError } from '@core/utils/http-error.util';
 import { toast } from '@spartan-ng/brain/sonner';
+import { AuthFacade } from '@modules/auth';
 
 @Component({
   selector: 'app-unit-conversion-list-page',
@@ -46,7 +47,14 @@ import { toast } from '@spartan-ng/brain/sonner';
     DataTableComponent,
   ],
   providers: [
-    provideIcons({ hugeDownload03, tablerDots, hugeEdit02, hugeDelete04, tablerLoader2, tablerArrowRight }),
+    provideIcons({
+      hugeDownload03,
+      tablerDots,
+      hugeEdit02,
+      hugeDelete04,
+      tablerLoader2,
+      tablerArrowRight,
+    }),
   ],
   styleUrl: './list-page.css',
   template: `
@@ -54,7 +62,7 @@ import { toast } from '@spartan-ng/brain/sonner';
       class="mb-4"
       title="Conversiones de Unidades"
       description="Gestione los factores de conversión entre unidades (ej: Cajas a Paquetes)"
-      actionLabel="Nueva Conversión"
+      [actionLabel]="canWrite() ? 'Nueva Conversión' : ''"
       (action)="onOpenFormDialog()"
     />
 
@@ -112,14 +120,20 @@ import { toast } from '@spartan-ng/brain/sonner';
 
       <ng-template #menuAction>
         <hlm-dropdown-menu class="w-40">
-          <button hlmDropdownMenuItem (click)="onOpenFormDialog(conversion)">
-            <ng-icon name="hugeEdit02" class="mr-2 h-4 w-4" /> Editar
-          </button>
-          <hlm-dropdown-menu-separator />
-          <button hlmDropdownMenuItem variant="destructive" (click)="onToggleStatus(conversion)">
-            <ng-icon name="hugeDelete04" class="mr-2 h-4 w-4" />
-            {{ conversion.active ? 'Deshabilitar' : 'Habilitar' }}
-          </button>
+          @if (canWrite()) {
+            <button hlmDropdownMenuItem (click)="onOpenFormDialog(conversion)">
+              <ng-icon name="hugeEdit02" class="mr-2 h-4 w-4" /> Editar
+            </button>
+          }
+          @if (canWrite() && canManage()) {
+            <hlm-dropdown-menu-separator />
+          }
+          @if (canManage()) {
+            <button hlmDropdownMenuItem variant="destructive" (click)="onToggleStatus(conversion)">
+              <ng-icon name="hugeDelete04" class="mr-2 h-4 w-4" />
+              {{ conversion.active ? 'Deshabilitar' : 'Habilitar' }}
+            </button>
+          }
         </hlm-dropdown-menu>
       </ng-template>
     </ng-template>
@@ -136,6 +150,9 @@ import { toast } from '@spartan-ng/brain/sonner';
 export default class ListPage implements OnInit {
   private readonly facade = inject(UnitConversionFacade);
   private readonly dialogService = inject(HlmDialogService);
+  private readonly auth = inject(AuthFacade);
+  readonly canWrite = computed(() => this.auth.hasPermission('UOM_CONVERSION.WRITE'));
+  readonly canManage = computed(() => this.auth.hasPermission('UOM_CONVERSION.MANAGE'));
 
   readonly conversions = this.facade.data;
   readonly isLoading = this.facade.isLoading;
@@ -149,30 +166,35 @@ export default class ListPage implements OnInit {
   private readonly statusTemplate = viewChild.required<TemplateRef<any>>('statusCell');
   private readonly actionsTemplate = viewChild.required<TemplateRef<any>>('actionsCell');
 
-  readonly tableColumns = computed<TableColumn<UnitConversion>[]>(() => [
-    {
-      key: 'productName',
-      label: 'Producto',
-    },
-    {
-      key: 'conversion',
-      label: 'Regla de Conversión',
-      customTemplate: this.conversionTemplate(),
-    },
-    {
-      key: 'status',
-      label: 'Estado',
-      align: 'center',
-      customTemplate: this.statusTemplate(),
-    },
-    {
-      key: 'actions',
-      label: 'Acciones',
-      align: 'center',
-      customTemplate: this.actionsTemplate(),
-      tdClass: 'w-24',
-    },
-  ]);
+  readonly tableColumns = computed<TableColumn<UnitConversion>[]>(() => {
+    const columns: TableColumn<UnitConversion>[] = [
+      {
+        key: 'productName',
+        label: 'Producto',
+      },
+      {
+        key: 'conversion',
+        label: 'Regla de Conversión',
+        customTemplate: this.conversionTemplate(),
+      },
+      {
+        key: 'status',
+        label: 'Estado',
+        align: 'center',
+        customTemplate: this.statusTemplate(),
+      },
+    ];
+    if (this.canWrite() || this.canManage()) {
+      columns.push({
+        key: 'actions',
+        label: 'Acciones',
+        align: 'center',
+        customTemplate: this.actionsTemplate(),
+        tdClass: 'w-24',
+      });
+    }
+    return columns;
+  });
 
   ngOnInit(): void {
     this.facade.load();

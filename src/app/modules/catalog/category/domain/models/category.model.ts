@@ -2,12 +2,15 @@ import { BaseEntity } from '@core/shared-kernel/models/base-entity.model';
 import { Searchable } from '@core/shared-kernel/models/search-params.model';
 
 export interface Category extends BaseEntity {
+  parentId: string | null;
   name: string;
   slug: string;
   description?: string;
 }
 
-export interface CategorySearchable extends Searchable {}
+export interface CategorySearchable extends Searchable {
+  parentId?: string | null;
+}
 
 export const CategorySearchableDefault: CategorySearchable = {
   page: 0,
@@ -19,6 +22,7 @@ export const CategorySearchableDefault: CategorySearchable = {
 };
 
 export interface CreateCategory {
+  parentId: string | null;
   name: string;
   slug: string;
   description?: string;

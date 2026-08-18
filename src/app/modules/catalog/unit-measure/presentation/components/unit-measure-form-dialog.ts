@@ -43,6 +43,14 @@ import { UnitMeasure } from '../../domain/models/unit-measure.model';
         <hlm-field-group>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <hlm-field>
+              <label hlmFieldLabel for="code">Código</label>
+              <input id="code" hlmInput autoComplete="off" [formField]="form.code" />
+
+              @for (error of form.code().errors(); track error) {
+                <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+              }
+            </hlm-field>
+            <hlm-field>
               <label hlmFieldLabel for="name">Nombre</label>
               <input id="name" hlmInput autoComplete="off" [formField]="form.name" />
 
@@ -53,18 +61,19 @@ import { UnitMeasure } from '../../domain/models/unit-measure.model';
               }
             </hlm-field>
             <hlm-field>
-              <label hlmFieldLabel for="abbreviation">Abreviatura</label>
-              <input
-                id="abbreviation"
-                hlmInput
-                autoComplete="off"
-                [formField]="form.abbreviation"
-              />
+              <label hlmFieldLabel for="taxCode">Código tributario</label>
+              <input id="taxCode" hlmInput autoComplete="off" [formField]="form.taxCode" />
 
-              @for (error of form.abbreviation().errors(); track error) {
-                <hlm-field-error [validator]="error.kind">
-                  {{ error.message }}
-                </hlm-field-error>
+              @for (error of form.taxCode().errors(); track error) {
+                <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
+              }
+            </hlm-field>
+            <hlm-field>
+              <label hlmFieldLabel for="symbol">Símbolo</label>
+              <input id="symbol" hlmInput autoComplete="off" [formField]="form.symbol" />
+
+              @for (error of form.symbol().errors(); track error) {
+                <hlm-field-error [validator]="error.kind">{{ error.message }}</hlm-field-error>
               }
             </hlm-field>
           </div>
@@ -119,16 +128,20 @@ export class UnitMeasureCreateDialog {
   protected readonly data = this._dialogContext.unitMeasure;
 
   protected readonly formModel = signal<UnitMeasureFormModel>({
+    code: this.data?.code ?? '',
     name: this.data?.name ?? '',
+    taxCode: this.data?.taxCode ?? '',
+    symbol: this.data?.symbol ?? '',
     description: this.data?.description ?? '',
-    abbreviation: this.data?.abbreviation ?? '',
   });
 
   public readonly form = form(
     this.formModel,
     (schema) => {
+      required(schema.code, { message: 'El campo es requerido' });
       required(schema.name, { message: 'El campo es requerido' });
-      required(schema.abbreviation, { message: 'El campo es requerido' });
+      required(schema.taxCode, { message: 'El campo es requerido' });
+      required(schema.symbol, { message: 'El campo es requerido' });
       maxLength(schema.description, 150, {
         message: 'La descripción no puede exceder 150 caracteres',
       });
@@ -141,8 +154,10 @@ export class UnitMeasureCreateDialog {
             const response = this.data
               ? await this.unitMeasureFacade.update({
                   ...this.data,
+                  code: fields.code,
                   name: fields.name,
-                  abbreviation: fields.abbreviation,
+                  taxCode: fields.taxCode,
+                  symbol: fields.symbol,
                   description: fields.description,
                 })
               : await this.unitMeasureFacade.create(fields);

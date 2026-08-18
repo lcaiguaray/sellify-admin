@@ -6,14 +6,14 @@ export const UnitConversionMapper = {
     if (!dto) return {} as UnitConversion;
     return {
       id: dto.id,
-      productId: dto.productId,
-      productName: dto.productName,
-      fromUnitId: dto.fromUnitId,
-      fromUnitName: dto.fromUnitName,
-      toUnitId: dto.toUnitId,
-      toUnitName: dto.toUnitName,
-      factor: dto.factor,
-      active: dto.active,
+      productId: dto.product?.id ?? null,
+      productName: dto.product?.name ?? 'Conversión general',
+      fromUnitId: dto.fromUom.id,
+      fromUnitName: dto.fromUom.name,
+      toUnitId: dto.toUom.id,
+      toUnitName: dto.toUom.name,
+      factor: Number(dto.multiplier),
+      active: dto.active ?? true,
       createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
       updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
     };
@@ -23,13 +23,26 @@ export const UnitConversionMapper = {
     if (!model) return null;
     return {
       id: model.id,
-      productId: model.productId,
-      productName: model.productName,
-      fromUnitId: model.fromUnitId,
-      fromUnitName: model.fromUnitName,
-      toUnitId: model.toUnitId,
-      toUnitName: model.toUnitName,
-      factor: model.factor,
+      product: model.productId
+        ? { id: model.productId, name: model.productName ?? '', sku: null }
+        : null,
+      fromUom: {
+        id: model.fromUnitId,
+        code: '',
+        name: model.fromUnitName ?? '',
+        taxCode: '',
+        symbol: '',
+        active: true,
+      },
+      toUom: {
+        id: model.toUnitId,
+        code: '',
+        name: model.toUnitName ?? '',
+        taxCode: '',
+        symbol: '',
+        active: true,
+      },
+      multiplier: model.factor,
       active: model.active,
     };
   },

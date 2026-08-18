@@ -2,8 +2,10 @@ import { BaseEntity } from '@core/shared-kernel/models/base-entity.model';
 import { Searchable } from '@core/shared-kernel/models/search-params.model';
 
 export interface UnitMeasure extends BaseEntity {
+  code: string;
   name: string;
-  abbreviation: string;
+  taxCode: string;
+  symbol: string;
   description?: string;
 }
 
@@ -19,7 +21,9 @@ export const UnitMeasureSearchableDefault: UnitMeasureSearchable = {
 };
 
 export interface CreateUnitMeasure {
+  code: string;
   name: string;
-  abbreviation: string;
+  taxCode: string;
+  symbol: string;
   description?: string;
 }

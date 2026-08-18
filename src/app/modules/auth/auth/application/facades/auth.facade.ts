@@ -19,6 +19,10 @@ export class AuthFacade {
 
   readonly isAuthenticated = computed(() => this.user() !== null);
 
+  hasPermission(permission: string): boolean {
+    return this.user()?.permissions.includes(permission) ?? false;
+  }
+
   async login(payload: LoginFormModel): Promise<ApiResponse<AuthResponse>> {
     try {
       const response = await firstValueFrom(this.repository.login(payload));

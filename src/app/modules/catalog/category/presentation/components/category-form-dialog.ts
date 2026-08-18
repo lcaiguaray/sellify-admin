@@ -14,6 +14,11 @@ import { parseHttpError } from '@core/utils/http-error.util';
 import { HlmSpinner } from '@ui-spartan/spinner';
 import { toast } from '@spartan-ng/brain/sonner';
 import { Category } from '../../domain/models/category.model';
+import { CategoryRepository } from '../../domain/repositories/category.repository';
+import { CategorySearchableDefault } from '../../domain/models/category.model';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import { HlmNativeSelectImports } from '@ui-spartan/native-select';
 
 @Component({
   selector: 'app-category-form-dialog',
@@ -25,6 +30,7 @@ import { Category } from '../../domain/models/category.model';
     HlmInputImports,
     HlmButtonImports,
     HlmInputGroupImports,
+    HlmNativeSelectImports,
     HlmSpinner,
   ],
   providers: [provideIcons({ hugePlusSign })],
@@ -41,6 +47,15 @@ import { Category } from '../../domain/models/category.model';
     <div class="no-scrollbar -mx-4 max-h-[70vh] overflow-y-auto px-4">
       <form [formRoot]="form" id="form-create-category">
         <hlm-field-group>
+          <hlm-field>
+            <label hlmFieldLabel for="parentId">Categoría superior</label>
+            <select id="parentId" hlmNativeSelect [formField]="form.parentId">
+              <option value="">Sin categoría superior</option>
+              @for (category of parentCategories(); track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </hlm-field>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <hlm-field>
               <label hlmFieldLabel for="name">Nombre</label>
@@ -114,12 +129,14 @@ import { Category } from '../../domain/models/category.model';
 })
 export class CategoryCreateDialog {
   private readonly categoryFacade = inject(CategoryFacade);
+  private readonly categoryRepository = inject(CategoryRepository);
   private readonly dialogRef = inject<BrnDialogRef<null>>(BrnDialogRef);
 
   private readonly _dialogContext = injectBrnDialogContext<{ category: Category }>();
   protected readonly data = this._dialogContext.category;
 
   protected readonly formModel = signal<CategoryFormModel>({
+    parentId: this.data?.parentId ?? '',
     name: this.data?.name ?? '',
     description: this.data?.description ?? '',
     slug: this.data?.slug ?? '',
@@ -144,11 +161,12 @@ export class CategoryCreateDialog {
             const response = this.data
               ? await this.categoryFacade.update({
                   ...this.data,
+                  parentId: fields.parentId || null,
                   name: fields.name,
                   slug: fields.slug,
                   description: fields.description,
                 })
-              : await this.categoryFacade.create(fields);
+              : await this.categoryFacade.create({ ...fields, parentId: fields.parentId || null });
             toast.success(response.message);
             this.close();
           } catch (err: any) {
@@ -160,6 +178,13 @@ export class CategoryCreateDialog {
   );
 
   public readonly descriptionLength = computed(() => this.form.description().value().length);
+  readonly parentCategoriesResource = rxResource({
+    stream: () =>
+      this.categoryRepository
+        .get({ ...CategorySearchableDefault, active: true, size: 100 })
+        .pipe(map((response) => response.data.content.filter((item) => item.id !== this.data?.id))),
+  });
+  readonly parentCategories = () => this.parentCategoriesResource.value() ?? [];
 
   constructor() {
     effect(() => {

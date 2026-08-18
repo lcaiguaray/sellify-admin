@@ -29,9 +29,19 @@ export class ProductHttpService extends BaseApiService implements ProductReposit
     );
   }
 
+  findById(id: Product['id']): Observable<ApiResponse<Product>> {
+    const url = this.buildUrl(`${this.resource}/${id}`);
+    return this.http.get<ApiResponse<ProductApiDto>>(url).pipe(
+      map((response) => ({
+        ...response,
+        data: ProductMapper.fromDto(response.data),
+      })),
+    );
+  }
+
   create(payload: CreateProduct): Observable<ApiResponse<Product>> {
     const url = this.buildUrl(`${this.resource}`);
-    return this.http.post<ApiResponse<ProductApiDto>>(url, payload).pipe(
+    return this.http.post<ApiResponse<ProductApiDto>>(url, ProductMapper.toRequest(payload)).pipe(
       map((response) => ({
         ...response,
         data: ProductMapper.fromDto(response.data),
@@ -41,7 +51,7 @@ export class ProductHttpService extends BaseApiService implements ProductReposit
 
   update(product: Product): Observable<ApiResponse<Product>> {
     const url = this.buildUrl(`${this.resource}/${product.id}`);
-    return this.http.put<ApiResponse<ProductApiDto>>(url, product).pipe(
+    return this.http.put<ApiResponse<ProductApiDto>>(url, ProductMapper.toRequest(product)).pipe(
       map((response) => ({
         ...response,
         data: ProductMapper.fromDto(response.data),

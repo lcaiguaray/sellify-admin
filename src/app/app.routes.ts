@@ -40,8 +40,7 @@ export const routes: Routes = [
       },
       {
         path: 'inventory',
-        loadChildren: () =>
-          import('@modules/inventory').then((m) => m.INVENTORY_ITEM_ROUTES),
+        loadChildren: () => import('@modules/inventory').then((m) => m.INVENTORY_ITEM_ROUTES),
       },
       {
         path: 'sales',
@@ -50,6 +49,15 @@ export const routes: Routes = [
       {
         path: 'crm',
         loadChildren: () => import('./modules/crm/crm.routes').then((m) => m.CRM_ROUTES),
+      },
+      {
+        path: 'auth',
+        loadChildren: () =>
+          import('@modules/auth').then((m) => [...m.USER_ROUTES, ...m.ROLE_ROUTES]),
+      },
+      {
+        path: 'core',
+        loadChildren: () => import('@modules/core').then((m) => m.CORE_ROUTES),
       },
     ],
   },

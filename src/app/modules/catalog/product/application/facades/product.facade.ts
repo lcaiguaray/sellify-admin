@@ -1,27 +1,29 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ApiResponse, PageMetadata } from '@core/shared-kernel/models/api-response.model';
 import { debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
-import { ProductRepository } from '../../domain/repositories/product.repository';
 import {
+  CreateProduct,
   Product,
   ProductSearchable,
   ProductSearchableDefault,
-  CreateProduct,
 } from '../../domain/models/product.model';
-import { ApiResponse, PageMetadata } from '@core/shared-kernel/models/api-response.model';
-import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ProductRepository } from '../../domain/repositories/product.repository';
 
 @Injectable({ providedIn: 'root' })
 export class ProductFacade {
   private readonly repository = inject(ProductRepository);
 
   readonly selected = signal<Product | null>(null);
-  readonly filters = signal<ProductSearchable | undefined>(undefined);
+  readonly filters = signal<ProductSearchable>(ProductSearchableDefault);
+  readonly processingIds = signal<Set<string>>(new Set<string>());
 
   private readonly debouncedFilters = toSignal(
     toObservable(this.filters).pipe(
       debounceTime(300),
       distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
     ),
+    { initialValue: undefined },
   );
 
   readonly resource = rxResource({
@@ -29,114 +31,121 @@ export class ProductFacade {
     stream: ({ params }) => this.repository.get(params),
   });
 
-  readonly data = computed(() => this.resource.value()?.data.content ?? []);
+  readonly data = computed(() => {
+    if (this.resource.error()) return [];
+    return this.resource.value()?.data.content ?? [];
+  });
   readonly isLoading = computed(() => this.resource.isLoading());
   readonly hasData = computed(() => this.data().length > 0);
+  readonly error = computed(() => this.resource.error());
 
   readonly pagination = computed<PageMetadata>(() => {
-    const responseData = this.resource.value()?.data;
-    if (responseData) {
-      return {
-        pageNumber: responseData.pageNumber,
-        pageSize: responseData.pageSize,
-        totalElements: responseData.totalElements,
-        totalPages: responseData.totalPages,
-        isLast: responseData.isLast,
-      };
+    if (this.resource.error()) {
+      return { pageNumber: 0, pageSize: 10, totalElements: 0, totalPages: 0, isLast: true };
     }
+
+    const data = this.resource.value()?.data;
     return {
-      pageNumber: 0,
-      pageSize: 10,
-      totalElements: 0,
-      totalPages: 0,
-      isLast: true,
+      pageNumber: data?.pageNumber ?? 0,
+      pageSize: data?.pageSize ?? 10,
+      totalElements: data?.totalElements ?? 0,
+      totalPages: data?.totalPages ?? 0,
+      isLast: data?.isLast ?? true,
     };
   });
 
-  load() {
+  load(): void {
     this.filters.set(ProductSearchableDefault);
   }
 
-  updateFilters(newFilters: Partial<ProductSearchable>) {
-    this.filters.update((current) =>
-      current ? { ...current, ...newFilters, page: 0 } : undefined,
-    );
+  updateFilters(newFilters: Partial<ProductSearchable>): void {
+    this.filters.update((current) => ({ ...current, ...newFilters, page: 0 }));
   }
 
-  changePage(page: number) {
-    if (page < 0 || page > this.pagination().totalPages) return;
-    this.filters.update((current) => (current ? { ...current, page } : undefined));
+  changePage(page: number): void {
+    if (page < 0 || page >= Math.max(this.pagination().totalPages, 1)) return;
+    this.filters.update((current) => ({ ...current, page }));
   }
 
-  changePageSize(pageSize: number) {
-    if (pageSize < 0) return;
-    this.filters.update((current) =>
-      current ? { ...current, size: pageSize, page: 0 } : undefined,
-    );
+  changePageSize(size: number): void {
+    if (size <= 0) return;
+    this.filters.update((current) => ({ ...current, size, page: 0 }));
+  }
+
+  async findById(id: Product['id']): Promise<ApiResponse<Product>> {
+    return firstValueFrom(this.repository.findById(id));
   }
 
   async create(payload: CreateProduct): Promise<ApiResponse<Product>> {
-    try {
-      const response = await firstValueFrom(this.repository.create(payload));
-      this.resource.value.update((current) => {
-        if (!current) return current;
-        return {
-          ...current,
-          data: {
-            ...current.data,
-            content: [response.data, ...current.data.content],
-          },
-        };
-      });
-      return response;
-    } catch (err) {
-      throw err;
-    }
+    const response = await firstValueFrom(this.repository.create(payload));
+    this.resource.reload();
+    return response;
   }
 
   async update(product: Product): Promise<ApiResponse<Product>> {
+    const response = await firstValueFrom(this.repository.update(product));
+    this.replaceProduct(response.data);
+    return response;
+  }
+
+  async enable(id: Product['id']): Promise<ApiResponse<void>> {
+    return this.setStatus(id, true);
+  }
+
+  async disable(id: Product['id']): Promise<ApiResponse<void>> {
+    return this.setStatus(id, false);
+  }
+
+  private async setStatus(id: Product['id'], active: boolean): Promise<ApiResponse<void>> {
+    this.setProcessing(id, true);
     try {
-      const response = await firstValueFrom(this.repository.update(product));
-      this.resource.value.update((current) => {
-        if (!current) return current;
-        return {
-          ...current,
-          data: {
-            ...current.data,
-            content: current.data.content.map((p) => (p.id === product.id ? response.data : p)),
-          },
-        };
-      });
+      const response = await firstValueFrom(
+        active ? this.repository.enable(id) : this.repository.disable(id),
+      );
+      this.updateStatus(id, active);
       return response;
-    } catch (err) {
-      throw err;
+    } finally {
+      this.setProcessing(id, false);
     }
   }
 
-  async enable(id: Product['id']) {
-    try {
-      await firstValueFrom(this.repository.enable(id));
-      this.updateStatus(id, true);
-    } catch (err) {}
+  private replaceProduct(product: Product): void {
+    this.resource.value.update((current) =>
+      current
+        ? {
+            ...current,
+            data: {
+              ...current.data,
+              content: current.data.content.map((item) =>
+                item.id === product.id ? product : item,
+              ),
+            },
+          }
+        : current,
+    );
   }
 
-  async disable(id: Product['id']) {
-    try {
-      await firstValueFrom(this.repository.disable(id));
-      this.updateStatus(id, false);
-    } catch (err) {}
+  private updateStatus(id: Product['id'], active: boolean): void {
+    this.resource.value.update((current) =>
+      current
+        ? {
+            ...current,
+            data: {
+              ...current.data,
+              content: current.data.content.map((item) =>
+                item.id === id ? { ...item, active } : item,
+              ),
+            },
+          }
+        : current,
+    );
   }
 
-  private updateStatus(id: Product['id'], active: boolean) {
-    this.resource.value.update((current) => {
-      if (!current) return current;
-      return {
-        ...current,
-        data: {
-          ...current.data,
-          content: current.data.content.map((p) => (p.id === id ? { ...p, active } : p)),
-        },
-      };
+  private setProcessing(id: string, processing: boolean): void {
+    this.processingIds.update((current) => {
+      const next = new Set(current);
+      processing ? next.add(id) : next.delete(id);
+      return next;
     });
   }
 }

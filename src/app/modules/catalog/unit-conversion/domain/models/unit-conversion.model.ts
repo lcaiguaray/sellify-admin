@@ -2,7 +2,7 @@ import { BaseEntity } from '@core/shared-kernel/models/base-entity.model';
 import { Searchable } from '@core/shared-kernel/models/search-params.model';
 
 export interface UnitConversion extends BaseEntity {
-  productId: string;
+  productId: string | null;
   productName?: string;
   fromUnitId: string;
   fromUnitName?: string;
@@ -25,7 +25,7 @@ export const UnitConversionSearchableDefault: UnitConversionSearchable = {
 };
 
 export interface CreateUnitConversion {
-  productId: string;
+  productId: string | null;
   fromUnitId: string;
   toUnitId: string;
   factor: number;
