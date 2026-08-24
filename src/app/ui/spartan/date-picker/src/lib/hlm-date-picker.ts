@@ -13,18 +13,18 @@ import {
   viewChild,
 } from '@angular/core';
 import { type ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  type BrnDatePickerBase,
+  BrnDatePickerTriggerToken,
+  provideBrnDatePicker,
+} from '@spartan-ng/brain/date-picker';
 import { BrnFieldControl, provideBrnLabelable } from '@spartan-ng/brain/field';
 import type { ChangeFn, TouchFn } from '@spartan-ng/brain/forms';
 import type { BrnOverlayState } from '@spartan-ng/brain/overlay';
 import { BrnPopover } from '@spartan-ng/brain/popover';
 import { HlmCalendar } from '@ui-spartan/calendar';
 import { HlmPopoverImports } from '@ui-spartan/popover';
-import { HlmDatePickerTriggerToken } from './hlm-date-picker-trigger.token';
-import {
-  HlmDatePickerBase,
-  injectHlmDatePickerConfig,
-  provideHlmDatePicker,
-} from './hlm-date-picker.token';
+import { injectHlmDatePickerConfig } from './hlm-date-picker.token';
 
 export const HLM_DATE_PICKER_VALUE_ACCESSOR = {
   provide: NG_VALUE_ACCESSOR,
@@ -37,7 +37,7 @@ export const HLM_DATE_PICKER_VALUE_ACCESSOR = {
   imports: [HlmPopoverImports, HlmCalendar],
   providers: [
     HLM_DATE_PICKER_VALUE_ACCESSOR,
-    provideHlmDatePicker(HlmDatePicker),
+    provideBrnDatePicker(HlmDatePicker),
     provideBrnLabelable(HlmDatePicker),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -64,12 +64,12 @@ export const HLM_DATE_PICKER_VALUE_ACCESSOR = {
     </hlm-popover>
   `,
 })
-export class HlmDatePicker<T> implements HlmDatePickerBase<T>, ControlValueAccessor {
+export class HlmDatePicker<T> implements BrnDatePickerBase<T>, ControlValueAccessor {
   private readonly _config = injectHlmDatePickerConfig<T>();
 
   public readonly popover = viewChild.required(BrnPopover);
 
-  private readonly _trigger = contentChild(HlmDatePickerTriggerToken);
+  private readonly _trigger = contentChild(BrnDatePickerTriggerToken);
 
   /** Show dropdowns to navigate between months or years. */
   public readonly captionLayout = input<
@@ -118,13 +118,16 @@ export class HlmDatePicker<T> implements HlmDatePickerBase<T>, ControlValueAcces
     return date ? this.formatDate()(date) : undefined;
   });
 
-  public readonly dateChange = output<T>();
+  public readonly dateChange = output<T | null>();
 
   public readonly labelableId = computed(() => this._trigger()?.triggerId());
 
   public readonly hasDate = computed(() => !!this._mutableDate());
 
-  protected _onChange?: ChangeFn<T>;
+  /** @internal The current raw value, used by inputs to reformat on focus. */
+  public readonly value = computed(() => this._mutableDate() ?? null);
+
+  protected _onChange?: ChangeFn<T | null>;
   protected _onTouched?: TouchFn;
 
   protected _onStateChange(state: BrnOverlayState) {
@@ -134,7 +137,7 @@ export class HlmDatePicker<T> implements HlmDatePickerBase<T>, ControlValueAcces
 
   protected _handleChange(value: T | undefined) {
     if (this._disabled()) return;
-    this.updateDate(value);
+    this.updateDate(value ?? null);
 
     if (this.autoCloseOnSelect()) {
       this._popoverState.set('closed');
@@ -147,13 +150,13 @@ export class HlmDatePicker<T> implements HlmDatePickerBase<T>, ControlValueAcces
    * close the popover - it's intended to be called from a text input that
    * is parsing user-entered values while typing.
    */
-  public updateDate(value: T | undefined) {
+  public updateDate(value: T | null) {
     if (this._disabled()) return;
-    const transformedDate = value !== undefined ? this.transformDate()(value) : undefined;
+    const transformedDate = value != null ? this.transformDate()(value) : undefined;
 
     this._mutableDate.set(transformedDate);
-    this._onChange?.(transformedDate as T);
-    this.dateChange.emit(transformedDate as T);
+    this._onChange?.(transformedDate ?? null);
+    this.dateChange.emit(transformedDate ?? null);
   }
 
   /** CONTROL VALUE ACCESSOR */
@@ -161,7 +164,7 @@ export class HlmDatePicker<T> implements HlmDatePickerBase<T>, ControlValueAcces
     this._mutableDate.set(value ? this.transformDate()(value) : undefined);
   }
 
-  public registerOnChange(fn: ChangeFn<T>): void {
+  public registerOnChange(fn: ChangeFn<T | null>): void {
     this._onChange = fn;
   }
 
@@ -187,7 +190,7 @@ export class HlmDatePicker<T> implements HlmDatePickerBase<T>, ControlValueAcces
 
   public reset() {
     this._mutableDate.set(undefined);
-    this._onChange?.(undefined as T);
-    this.dateChange.emit(undefined as T);
+    this._onChange?.(null);
+    this.dateChange.emit(null);
   }
 }

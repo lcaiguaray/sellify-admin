@@ -1,7 +1,7 @@
 export interface RoleApiDto {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   active: boolean;
   createdAt?: Date;
   updatedAt?: Date;

@@ -9,23 +9,23 @@ import {
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronDown } from '@ng-icons/lucide';
+import {
+  type BrnDatePickerTriggerBase,
+  injectBrnDatePicker,
+  provideBrnDatePickerTrigger,
+} from '@spartan-ng/brain/date-picker';
 import { BrnFieldControl, BrnFieldControlDescribedBy } from '@spartan-ng/brain/field';
 import { ButtonVariants, HlmButtonImports } from '@ui-spartan/button';
 import { HlmPopoverTrigger } from '@ui-spartan/popover';
 import { hlm } from '@ui-spartan/utils';
 import { ClassValue } from 'clsx';
-import {
-  HlmDatePickerTriggerBase,
-  provideHlmDatePickerTrigger,
-} from './hlm-date-picker-trigger.token';
-import { injectHlmDatePicker } from './hlm-date-picker.token';
 
 @Component({
   selector: 'hlm-date-picker-trigger',
   imports: [HlmButtonImports, HlmPopoverTrigger, NgIcon, BrnFieldControlDescribedBy],
   providers: [
     provideIcons({ lucideChevronDown }),
-    provideHlmDatePickerTrigger(HlmDatePickerTrigger),
+    provideBrnDatePickerTrigger(HlmDatePickerTrigger),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { 'data-slot': 'date-picker-trigger' },
@@ -61,11 +61,11 @@ import { injectHlmDatePicker } from './hlm-date-picker.token';
     </button>
   `,
 })
-export class HlmDatePickerTrigger implements HlmDatePickerTriggerBase {
+export class HlmDatePickerTrigger implements BrnDatePickerTriggerBase {
   private static _nextId = 0;
 
   private readonly _fieldControl = inject(BrnFieldControl, { optional: true });
-  private readonly _datePicker = injectHlmDatePicker();
+  private readonly _datePicker = injectBrnDatePicker();
 
   private readonly _invalid = this._fieldControl?.invalid;
   protected readonly _spartanInvalid = computed(

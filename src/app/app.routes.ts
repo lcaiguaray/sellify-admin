@@ -29,12 +29,36 @@ export const routes: Routes = [
       },
       {
         path: 'catalog',
-        loadChildren: () => import('@modules/catalog').then((m) => m.BRAND_ROUTES),
+        loadChildren: () =>
+          import('@modules/catalog').then((m) => [
+            ...m.BRAND_ROUTES,
+            ...m.CATEGORY_ROUTES,
+            ...m.UNIT_MEASURE_ROUTES,
+            ...m.UNIT_CONVERSION_ROUTES,
+            ...m.PRODUCT_ROUTES,
+          ]),
       },
-      // {
-      //   path: 'inventory',
-      //   loadChildren: () => import('@modules/inventory/inventory.routes').then((m) => m.INVENTORY_ROUTES),
-      // }
+      {
+        path: 'inventory',
+        loadChildren: () => import('@modules/inventory').then((m) => m.INVENTORY_ITEM_ROUTES),
+      },
+      {
+        path: 'sales',
+        loadChildren: () => import('./modules/sales/sales.routes').then((m) => m.SALES_ROUTES),
+      },
+      {
+        path: 'crm',
+        loadChildren: () => import('./modules/crm/crm.routes').then((m) => m.CRM_ROUTES),
+      },
+      {
+        path: 'auth',
+        loadChildren: () =>
+          import('@modules/auth').then((m) => [...m.USER_ROUTES, ...m.ROLE_ROUTES]),
+      },
+      {
+        path: 'core',
+        loadChildren: () => import('@modules/core').then((m) => m.CORE_ROUTES),
+      },
     ],
   },
 

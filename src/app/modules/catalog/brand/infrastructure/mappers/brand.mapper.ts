@@ -9,7 +9,7 @@ export const BrandMapper = {
       name: dto.name,
       slug: dto.slug,
       description: dto.description,
-      logo_url: dto.logo_url,
+      logoUrl: dto.logoUrl,
       active: dto.active,
       createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
       updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
@@ -23,7 +23,7 @@ export const BrandMapper = {
       name: model.name,
       slug: model.slug,
       description: model.description,
-      logo_url: model.logo_url,
+      logoUrl: model.logoUrl,
       active: model.active,
     };
   },

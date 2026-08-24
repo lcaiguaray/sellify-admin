@@ -1,11 +1,11 @@
-import { BaseEntity } from "@core/shared-kernel/models/base-entity.model";
-import { Searchable } from "@core/shared-kernel/models/search-params.model";
+import { BaseEntity } from '@core/shared-kernel/models/base-entity.model';
+import { Searchable } from '@core/shared-kernel/models/search-params.model';
 
 export interface Brand extends BaseEntity {
   name: string;
   slug: string;
   description?: string;
-  logo_url?: string;
+  logoUrl?: string;
 }
 
 export interface BrandSearchable extends Searchable {}
@@ -23,5 +23,5 @@ export interface CreateBrand {
   name: string;
   slug: string;
   description?: string;
-  logo_url?: string;
+  logoUrl?: string;
 }

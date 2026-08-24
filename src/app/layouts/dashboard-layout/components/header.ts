@@ -14,11 +14,11 @@ import { HlmSidebarImports } from '@ui-spartan/sidebar';
         <nav hlmBreadcrumb>
           <ol hlmBreadcrumbList>
             <li hlmBreadcrumbItem class="hidden sm:block">
-              <a hlmBreadcrumbLink link="/">Building Your Application</a>
+              <a hlmBreadcrumbLink link="/">JASNIK</a>
             </li>
             <li hlmBreadcrumbSeparator class="hidden sm:block"></li>
             <li hlmBreadcrumbItem>
-              <a hlmBreadcrumbPage>Data Fetching</a>
+              <a hlmBreadcrumbPage>Panel de Control</a>
             </li>
           </ol>
         </nav>

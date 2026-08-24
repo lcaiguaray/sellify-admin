@@ -13,7 +13,7 @@ import { hugeShoppingBag01 } from '@ng-icons/huge-icons';
           <ng-icon name="hugeShoppingBag01" />
         </div>
 
-        <span class="font-medium font-dancing-script text-2xl leading-none">Sellify</span>
+        <span class="font-bold font-inter text-2xl leading-none tracking-wider">JASNIK</span>
       </div>
     }
   `,

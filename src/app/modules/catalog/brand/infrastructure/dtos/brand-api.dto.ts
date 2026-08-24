@@ -3,7 +3,7 @@ export interface BrandApiDto {
   name: string;
   slug: string;
   description?: string;
-  logo_url?: string;
+  logoUrl?: string;
   active: boolean;
   createdAt?: string;
   updatedAt?: string;
